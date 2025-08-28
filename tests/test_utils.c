@@ -8,8 +8,8 @@
 #include "test.h"
 
 
-#define __NUM_THREADS 4
-#define __INCREMENTS 10000
+#define __NUM_THREADS 20
+#define __INCREMENTS 1000
 
 static SpinLock _spinLock;
 
@@ -25,6 +25,18 @@ static void *_worker(__attribute__((unused)) void *arg) {
         counter++;
         nanosleep(&ts, NULL);
         unlockSpinLock(&_spinLock);
+    }
+
+    return NULL;
+}
+
+static void *_worker_without_spinlock(__attribute__((unused)) void *arg) {
+    struct timespec ts;
+    ts.tv_sec = 0;
+    ts.tv_nsec = 100000L; /* sleep 0.1ms */
+    for(int i = 0; i < __INCREMENTS; i++) {
+        counter++;
+        nanosleep(&ts, NULL);
     }
 
     return NULL;
@@ -50,14 +62,91 @@ static int test_SpinLock() {
         pthread_join(threads[i], NULL);
     }
 
+    printf("counter = %lld WITH 'spinlock'\n", counter);
     assert(counter == __NUM_THREADS * __INCREMENTS);
+
+    counter = 0;
+    /* create threads */
+    for(int i = 0; i < __NUM_THREADS; i++) {
+        if(pthread_create(&threads[i], NULL, _worker_without_spinlock, NULL) != 0) {
+            perror("pthread_create");
+            return -1;
+        }
+    }
+
+    /* join threads */
+    for(int i = 0; i < __NUM_THREADS; i++) {
+        pthread_join(threads[i], NULL);
+    }
+    printf("counter = %lld WITHOUT 'spinlock'\n", counter);
+    assert(counter <= __NUM_THREADS * __INCREMENTS);
     
     _TEST_END();
 
     return 0;
 }
 
+static void test_minSizeByAlign() {
+    _TEST_BEGIN();
+
+    uintptr_t alignV1 = 0xffffffffffffff00, alignV2=0xffffffffffffffe0;
+
+    printf("minSizeByAlign(%p) = %p(%ld)\n", (void *)alignV1, 
+            (void *)minSizeByAlign(alignV1), minSizeByAlign(alignV1));
+    assert(minSizeByAlign(alignV1) == 0x100);
+    printf("minSizeByAlign(%p) = %p(%ld)\n", 
+            (void *)alignV2, (void *)minSizeByAlign(alignV2), minSizeByAlign(alignV2));
+    assert(minSizeByAlign(alignV2) == 0x20);
+
+    _TEST_END();
+}
+
+
+static void test_floorAlign() {
+    _TEST_BEGIN();
+
+    uintptr_t v, alignV1 = 0xffffffffffffff00, alignV2=0xffffffffffffffe0;
+
+    v = 0x130;
+    printf("floorAlign(%p, %p) = %p\n", (void *)v, (void *)alignV1, (void *)floorAlign(v, alignV1));
+    assert(floorAlign(v, alignV1) == 0x100);
+    printf("floorAlign(%p, %p) = %p\n", (void *)v, (void *)alignV2, (void *)floorAlign(v, alignV2));
+    assert(floorAlign(v, alignV2) == 0x120);
+
+    v = 0x30;
+    printf("floorAlign(%p, %p) = %p\n", (void *)v, (void *)alignV1, (void *)floorAlign(v, alignV1));
+    assert(floorAlign(v, alignV1) == 0x0);
+    printf("floorAlign(%p, %p) = %p\n", (void *)v, (void *)alignV2, (void *)floorAlign(v, alignV2));
+    assert(floorAlign(v, alignV2) == 0x20);
+
+    _TEST_END();
+}
+
+static void test_ceilAlign() {
+    _TEST_BEGIN();
+
+    uintptr_t v, alignV1 = 0xffffffffffffff00, alignV2=0xffffffffffffffe0;
+
+    v = 0x130;
+    printf("ceilAlign(%p, %p) = %p\n", (void *)v, (void *)alignV1, (void *)ceilAlign(v, alignV1));
+    assert(ceilAlign(v, alignV1) == 0x200);
+    printf("ceilAlign(%p, %p) = %p\n", (void *)v, (void *)alignV2, (void *)ceilAlign(v, alignV2));
+    assert(ceilAlign(v, alignV2) == 0x140);
+
+    v = 0x30;
+    printf("ceilAlign(%p, %p) = %p\n", (void *)v, (void *)alignV1, (void *)ceilAlign(v, alignV1));
+    assert(ceilAlign(v, alignV1) == 0x100);
+    printf("ceilAlign(%p, %p) = %p\n", (void *)v, (void *)alignV2, (void *)ceilAlign(v, alignV2));
+    assert(ceilAlign(v, alignV2) == 0x40);
+
+    _TEST_END();
+}
+
+
 
 int main(void) {
     assert(test_SpinLock() >= 0);
+    test_minSizeByAlign();
+    test_floorAlign();
+    test_ceilAlign();
 }

@@ -5,6 +5,7 @@
 #ifndef _UTILS_H_
 #define _UTILS_H_
 #include <stdlib.h>
+#include <stdint.h>
 
 /*
  * using macro to define memory management function, 
@@ -67,5 +68,51 @@ typedef struct {
             : "memory"                      \
         );                                  \
     } while(0)
+
+
+/**
+ * @brief get min value by align value
+ * 
+ * @param alignValue: align value
+ * 
+ * @return mininal value after align
+ */
+#define minSizeByAlign(alignValue)                      \
+    ({                                                  \
+        typeof(alignValue) __msba_av = (alignValue);    \
+        ~__msba_av + 1;                                 \
+    })
+
+
+/**
+ * @brief get floor of a value by align
+ * 
+ * @param value: value need be align
+ * @param align: the value of align
+ * 
+ * @return floor align value with type of uintptr_t
+ */
+#define floorAlign(value, align)                \
+    ({                                          \
+        uintptr_t __fa_v = (uintptr_t)(value);  \
+        uintptr_t __fa_a = (uintptr_t)(align);  \
+        __fa_v & __fa_a;                        \
+    })
+
+
+/**
+ * @brief upper align a address
+ * 
+ * @param value: value need be align
+ * @param align: the value of align
+ * 
+ * @return ceil align value with type of uintptr_t
+ */
+#define ceilAlign(value, align)                                                                 \
+    ({                                                                                          \
+        uintptr_t __ca_v = (uintptr_t)(value);                                                  \
+        uintptr_t __ca_a = (uintptr_t)(align);                                                  \
+        (__ca_v & ~__ca_a) ? (floorAlign(__ca_v, __ca_a) + minSizeByAlign(__ca_a)) : __ca_v;    \
+    })
 
 #endif /* _UTILS_H_ */
