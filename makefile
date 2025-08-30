@@ -70,5 +70,5 @@ all: $(STATIC_LIB) $(SHARED_LIB)
 clean:
 	rm -rf $(BUILD) $(LIBDIR) $(TEST_BUILD) $(TEST_BIN_DIR)
 
-test: CFLAGS += -g -I$(TEST_SRC_DIR)/include
+test: CFLAGS += -g -I$(TEST_SRC_DIR)/include -DENABLE_DEBUG
 test: $(TEST_BIN)

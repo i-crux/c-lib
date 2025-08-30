@@ -6,6 +6,7 @@
 #define _UTILS_H_
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 
 /*
  * using macro to define memory management function, 
@@ -114,5 +115,86 @@ typedef struct {
         uintptr_t __ca_a = (uintptr_t)(align);                                                  \
         (__ca_v & ~__ca_a) ? (floorAlign(__ca_v, __ca_a) + minSizeByAlign(__ca_a)) : __ca_v;    \
     })
+
+
+/**
+ * @brief in structure [type], get offset of [member]
+
+ * @param __oso_type typeof[type]
+ * @param __oso_member name of member
+ * 
+ * @return offset of [member] in type
+ */
+#define offsetOf(__oso_type, __oso_member) ((size_t) &((__oso_type *)0)->__oso_member)
+
+/**
+ * @brief get address of [type]
+
+ * @param __co_ptr pointor to member;
+ * @param __co_type typeof(type)
+ * @param __co_member name of member
+ * 
+ * @return address of [type] which contained member pointed by [ptr]
+ */
+#define containerOf(__co_ptr, __co_type, __co_member) ((__co_type *)((char *)(__co_ptr) - offsetOf(__co_type, __co_member)))
+
+
+/**
+ * @brief get the smaller value
+ * 
+ * @param a: value [a]
+ * @param b: value [b]
+ * 
+ * @return the smaller value
+ */
+#define min(_a, _b)                             \
+    ({                                          \
+        typeof(_a) __min_a = (_a);              \
+        typeof(_b) __min_b = (_b);              \
+        __min_a <= __min_b ? __min_a : __min_b; \
+    })
+
+
+/**
+ * @brief get the bigger value
+ * 
+ * @param a: value [a]
+ * @param b: value [b]
+ * 
+ * @return the bigger value
+ */
+#define max(_a, _b)                             \
+    ({                                          \
+        typeof(_a) __max_a = (_a);              \
+        typeof(_b) __max_b = (_b);              \
+        __max_a >= __max_b ? __max_a : __max_b; \
+    })
+
+
+/**
+ * @brief: check the pointor p, if p == val then return ret
+ * 
+ * @param p: the pointor needed to be checked
+ * @param val: checked val
+ * 
+ * @return ret if p == val else not excute return
+ */
+#define ckpvThenReturn(p, val, ret)                 \
+    do {                                            \
+        uintptr_t __ckpvtr_ptr = (uintptr_t)(p);    \
+        uintptr_t __ckpvtr_val = (uintptr_t)(val);  \
+        typeof(ret) __ckpvtr_ret = (ret);           \
+        if( __ckpvtr_ptr == __ckpvtr_val ) {        \
+            return __ckpvtr_ret;                    \
+        }                                           \
+    } while(0)
+
+
+#define bzero(p, s)                     \
+    do {                                \
+        void *__bz_ptr = (void *)(p);   \
+        size_t __bz_size = (size_t)(s); \
+        memset(__bz_ptr, 0, __bz_size); \
+    } while(0)
 
 #endif /* _UTILS_H_ */

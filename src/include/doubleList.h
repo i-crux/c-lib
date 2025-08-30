@@ -6,6 +6,7 @@
 typedef struct doubleList DoubleList;
 typedef struct doubleListNode DoubleListNode;
 typedef void (*nodeFree)(DoubleListNode *node);
+typedef void (*visitFunc)(DoubleListNode *node);
 
 /*
  * structure of double list node
@@ -199,6 +200,23 @@ struct doubleList
         addDoubleListNodeAfter(__anadlt_dlp->header.prev, doubleListNodeNewPtr);    \
     } while(0)
 
+
+/**
+ * @brief: traval a double list
+ * 
+ * @param doubleListPtr: pointor of a Double list
+ * @param func: visit function
+ */
+#define travalDoubleList(doubleListPtr, func)                   \
+    do {                                                        \
+        DoubleList *__tdl_dlp = (DoubleList *)(doubleListPtr);  \
+        visitFunc  __tdl_func = (visitFunc)(func);              \
+        DoubleListNode *__tdl_dlnp = __tdl_dlp->header.next;    \
+        while(!isDoubleListSentinel(__tdl_dlnp)) {              \
+            __tdl_func(__tdl_dlnp);                             \
+            __tdl_dlnp = __tdl_dlnp->next;                      \
+        }                                                       \
+    } while(0)
 
 /**
  * @brief destory a double list, if [doubleList->deNode] != NULL, call [deNode]

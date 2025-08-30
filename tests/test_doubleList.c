@@ -9,6 +9,10 @@ static void _deNodeFuncDummy(DoubleListNode *p) {
     free(p);
 }
 
+static void _visitFunc(DoubleListNode *p) {
+    printf("%p, %p, %p\n", p, p->prev, p->next);
+}
+
 static void test_initDoubleListNode() {
     _TEST_BEGIN();
 
@@ -135,6 +139,7 @@ static void test_addDoubleListNodeAfter() {
     assert(dln.doubleList == &dl && dln.next == &dln1 && dln.prev == &dl.header);
     assert(dln1.doubleList == &dl && dln1.next == &dln2 && dln1.prev == &dln);
     assert(dln2.doubleList == &dl && dln2.next == &dl.header && dln2.prev == &dln1);
+    travalDoubleList(&dl, _visitFunc);
 
     _TEST_END();
 }

@@ -142,6 +142,31 @@ static void test_ceilAlign() {
     _TEST_END();
 }
 
+static void test_offsetAndcontainerOf() {
+    _TEST_BEGIN();
+    typedef struct {
+        int a;
+        int b;
+    } TestStruct;
+    TestStruct ta;
+    assert(offsetOf(TestStruct, a) == 0);
+    assert(offsetOf(TestStruct, b) == sizeof(int));
+    assert(containerOf(&ta.a, TestStruct, a) == &ta);
+    assert(containerOf(&ta.b, TestStruct, b) == &ta);
+
+    _TEST_END();
+}
+
+
+static void test_minAndmax() {
+    _TEST_BEGIN();
+
+    int a = 1, b = 3;
+    assert(min(a, b) == a);
+    assert(max(a, b) == b);
+
+    _TEST_END();
+}
 
 
 int main(void) {
@@ -149,4 +174,6 @@ int main(void) {
     test_minSizeByAlign();
     test_floorAlign();
     test_ceilAlign();
+    test_offsetAndcontainerOf();
+    test_minAndmax();
 }
