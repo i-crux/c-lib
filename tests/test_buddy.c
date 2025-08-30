@@ -21,7 +21,7 @@ static void _visit(DoubleListNode *dlnp) {
     printf("========\n");                               \
 } while(0)
 
-static void test_initBuddy() {
+static void test_Buddy() {
     _TEST_BEGIN();
     size_t  size = 4096;
     uint8_t magic = 0x84;
@@ -115,7 +115,7 @@ static void test_initBuddy() {
     
     _travalBuddy(bp);
 
-    printf("✅ Random stress test finished successfully.\n");
+    printf("[X] Random stress test finished successfully.\n");
 
     a = buddyAlloc(bp, 512);
     printf("a = %p\n", a);
@@ -129,6 +129,6 @@ static void test_initBuddy() {
 
 
 int main(void) {
-    test_initBuddy();
+    test_Buddy();
     return 0;
 }

@@ -438,7 +438,7 @@ void *buddyAlloc(Buddy *bp, size_t size) {
     uintptr_t  addr;
 
     if(order >= BUDDY_MAX_ORDER) {
-        goto _done;
+        goto _exit;
     }
 
     lockSpinLock(&bp->lock);
@@ -474,29 +474,32 @@ _alloc:
 _done:
     unlockSpinLock(&bp->lock);
 
+_exit:
     return ret;
 }
 
 
 void buddyFree(void *ptr) {
+    if(!ptr) {
+        goto _exit;
+    }
+
     _BuddyBlockMgr  *bbmp = _getBuddyBlockMgrPtr(ptr);
     _BuddyMgrSec    *bbsp = (_BuddyMgrSec *)bbmp;
     Buddy           *bp = _getPtrOfBuddyFromBuddyMgrSec(bbsp);
     uint8_t         order = _getOrderFromBuddyMgrSec(bbsp);
     uint8_t         magic = _getMagicFromBuddyMgrSec(bbsp);
 
+    lockSpinLock(&bp->lock);
     if (magic != 0) {
         goto _done;
     }
-
     _initBuddyBlockMgr(bbmp, bp, order, bp->magic);
-
-    lockSpinLock(&bp->lock);
-
     addNodeAtDoubleListHeader(&bp->array[order], &bbmp->dln);
 
-    unlockSpinLock(&bp->lock);
 _done:
+    unlockSpinLock(&bp->lock);
+_exit:
     return;
 }
 
