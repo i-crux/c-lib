@@ -168,6 +168,22 @@ static void test_minAndmax() {
     _TEST_END();
 }
 
+static void test_swapMem() {
+    _TEST_BEGIN();
+
+    char a[] = "hello Bitch";
+    char b[] = "hello World";
+    size_t s = sizeof("hello Bitch");
+
+    printf("before swap(size = %lu) a: %s, b: %s\n", s, a, b);
+
+    swapMem(a, b, s);
+
+    printf("after swap(size = %lu) a: %s, b: %s\n", s, a, b);
+    
+    _TEST_END();
+}
+
 
 int main(void) {
     assert(test_SpinLock() >= 0);
@@ -176,4 +192,5 @@ int main(void) {
     test_ceilAlign();
     test_offsetAndcontainerOf();
     test_minAndmax();
+    test_swapMem();
 }

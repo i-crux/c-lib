@@ -4,9 +4,11 @@
 
 #ifndef _UTILS_H_
 #define _UTILS_H_
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <time.h>
 
 /*
  * using macro to define memory management function, 
@@ -196,5 +198,50 @@ typedef struct {
         size_t __bz_size = (size_t)(s); \
         memset(__bz_ptr, 0, __bz_size); \
     } while(0)
+
+
+/**
+ * @brief swap two memory 
+ * 
+ * @param ma pointor to the first memory
+ * @param mb pointor to the 2nd memory
+ * @param size memory size 
+ */
+#define swapMem(ma, mb, size)                                       \
+    do {                                                            \
+        size_t __sm_size = (size_t)(size);                          \
+        uint8_t __sm_tmp[__sm_size]; /* for swaping tmp memory */   \
+        void *__sm_a = (void *)(ma);                                \
+        void *__sm_b = (void *)(mb);                                \
+        memcpy((void *)__sm_tmp, __sm_a, __sm_size);                \
+        memcpy(__sm_a, __sm_b, __sm_size);                          \
+        memcpy(__sm_b, (void *)__sm_tmp, __sm_size);                \
+    } while(0)
+
+
+/**
+ * @brief free a address 
+ * @param p: pointor needed by free
+ */
+void freeMem(void *p);
+
+_Thread_local static int seedSet = 0;
+
+static inline void _setRandSeed(void) {
+    if (!seedSet) {
+        srand(time(NULL));
+        seedSet = 1;
+    }    
+}
+
+
+/**
+ * 在 min 和 max 之前取随机数
+ * @param min 随机数的下限
+ * @param max 随机数的上限
+ * @return 返回 min, max 之间的随机整数
+ */
+#define randRange(min, max) ({_setRandSeed(); rand() % ((max) - (min) + 1) + (min);})
+
 
 #endif /* _UTILS_H_ */
