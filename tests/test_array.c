@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "test.h"
 #include "array.h"
@@ -7,6 +8,14 @@
 static int cmpInt(const void *a, const void *b) {
     int intA = *(int *)a, intB = *(int *)b;
     return intA - intB;
+}
+
+static int cmpStrPtr(const void *a, const void *b) {
+    return strcmp((const char *)(*(char **)a), (const char *)(*(char **)b));
+}
+
+static int cmpStr(const void *a, const void *b) {
+    return strcmp((const char *)a, (const char *)b);
 }
 
 static int _dummySearch(__attribute__((unused))const Array *arr, __attribute__((unused))const void *key) {
@@ -193,7 +202,6 @@ static inline void test_elemSwap() {
     assert(*(int *)arrayGetElem(arr, 0) == 1);
     assert(*(int *)arrayGetElem(arr, 1) == 0);
 
-
     _TEST_END();
 }
 
@@ -242,6 +250,64 @@ static inline void test_pushPopSearchTraval() {
 }
 
 
+static inline void test_elemStrSwap() {
+    _TEST_BEGIN();
+
+    char *a = "hello", *b = "bitch";
+
+    Array *arrStrPtr = arrayCreate(sizeof(char *), _INIT_CAP, cmpStrPtr);
+    arrayPush(arrStrPtr, &a);
+    arrayPush(arrStrPtr, &b);
+
+    assert(strcmp((const char *)(*(char **)arrayGetElem(arrStrPtr, 0)), "hello") == 0);
+    assert(strcmp((const char *)(*(char **)arrayGetElem(arrStrPtr, 1)), "bitch") == 0);
+
+    assert(arraySwapElemUsingDynamicMem(arrStrPtr, 0, 1));
+    assert(strcmp((const char *)(*(char **)arrayGetElem(arrStrPtr, 1)), "hello") == 0);
+    assert(strcmp((const char *)(*(char **)arrayGetElem(arrStrPtr, 0)), "bitch") == 0);
+
+    assert(arraySwapElemFixedBuffer(arrStrPtr, 0, 1));
+    assert(strcmp((const char *)(*(char **)arrayGetElem(arrStrPtr, 0)), "hello") == 0);
+    assert(strcmp((const char *)(*(char **)arrayGetElem(arrStrPtr, 1)), "bitch") == 0);
+
+    assert(arraySwapElem(arrStrPtr, 0, 1));
+    assert(strcmp((const char *)(*(char **)arrayGetElem(arrStrPtr, 1)), "hello") == 0);
+    assert(strcmp((const char *)(*(char **)arrayGetElem(arrStrPtr, 0)), "bitch") == 0);
+
+    arrayDestroy(arrStrPtr, 1);
+
+    a = "fuck bitch\n\t";
+    b = "hell world\n\n";
+    arrStrPtr = arrayCreate(sizeof("fuck bitch\n\t"), _INIT_CAP, cmpStr);
+    arrayPush(arrStrPtr, a);
+    arrayPush(arrStrPtr, b);
+
+    assert(strcmp((const char *)arrayGetElem(arrStrPtr, 0), a) == 0);
+    assert(strcmp((const char *)arrayGetElem(arrStrPtr, 1), b) == 0);
+    printf("%s, %s\n", (char *)arrayGetElem(arrStrPtr, 0), (char *)arrayGetElem(arrStrPtr, 1));
+
+    assert(arraySwapElemUsingDynamicMem(arrStrPtr, 0, 1));
+    assert(strcmp((const char *)arrayGetElem(arrStrPtr, 1), a) == 0);
+    assert(strcmp((const char *)arrayGetElem(arrStrPtr, 0), b) == 0);
+    printf("%s, %s\n", (char *)arrayGetElem(arrStrPtr, 0), (char *)arrayGetElem(arrStrPtr, 1));
+
+    assert(arraySwapElemFixedBuffer(arrStrPtr, 0, 1));
+    assert(strcmp((const char *)arrayGetElem(arrStrPtr, 0), a) == 0);
+    assert(strcmp((const char *)arrayGetElem(arrStrPtr, 1), b) == 0);
+    printf("%s, %s\n", (char *)arrayGetElem(arrStrPtr, 0), (char *)arrayGetElem(arrStrPtr, 1));
+
+    assert(arraySwapElem(arrStrPtr, 0, 1));
+    assert(strcmp((const char *)arrayGetElem(arrStrPtr, 1), a) == 0);
+    assert(strcmp((const char *)arrayGetElem(arrStrPtr, 0), b) == 0);
+    printf("%s, %s\n", (char *)arrayGetElem(arrStrPtr, 0), (char *)arrayGetElem(arrStrPtr, 1));
+
+
+    arrayDestroy(arrStrPtr, 1);
+
+    _TEST_END();
+}
+
+
 int main(void) {
     test_arrayInit();
     test_arrayCreate();
@@ -249,6 +315,7 @@ int main(void) {
     test_arrayInsertAndDelete();
     test_elemSwap();
     test_pushPopSearchTraval();
+    test_elemStrSwap();
     return 0;
 }
 

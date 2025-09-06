@@ -207,7 +207,7 @@ typedef struct {
  * @param mb pointor to the 2nd memory
  * @param size memory size 
  */
-#define swapMem(ma, mb, size)                                       \
+#define swapMemUsingDymArr(ma, mb, size)                            \
     do {                                                            \
         size_t __sm_size = (size_t)(size);                          \
         uint8_t __sm_tmp[__sm_size]; /* for swaping tmp memory */   \
@@ -218,6 +218,24 @@ typedef struct {
         memcpy(__sm_b, (void *)__sm_tmp, __sm_size);                \
     } while(0)
 
+/**
+ * @brief swap two memory 
+ * 
+ * @param ma pointor to the first memory
+ * @param mb pointor to the 2nd memory
+ * @param size memory size 
+ */
+#define swapMem(ma, mb, size)                                                   \
+    do {                                                                        \
+        size_t __smxor_size = (size_t)(size);                                   \
+        uint8_t *__smxor_a = (uint8_t *)(ma);                                   \
+        uint8_t *__smxor_b = (uint8_t *)(mb);                                   \
+        for(size_t __smxor_i = 0; __smxor_i < __smxor_size; __smxor_i++) {      \
+            __smxor_a[__smxor_i] = __smxor_a[__smxor_i] ^ __smxor_b[__smxor_i]; \
+            __smxor_b[__smxor_i] = __smxor_a[__smxor_i] ^ __smxor_b[__smxor_i]; \
+            __smxor_a[__smxor_i] = __smxor_a[__smxor_i] ^ __smxor_b[__smxor_i]; \
+        }                                                                       \
+    } while(0)
 
 /**
  * @brief free a address 
