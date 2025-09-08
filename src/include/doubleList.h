@@ -5,7 +5,7 @@
 
 typedef struct doubleList DoubleList;
 typedef struct doubleListNode DoubleListNode;
-typedef void (*nodeFree)(DoubleListNode *node);
+typedef void (*doubleListNodeFree)(void *node);
 typedef void (*visitFunc)(DoubleListNode *node);
 
 /*
@@ -23,9 +23,9 @@ struct doubleListNode
  */
 struct doubleList
 {
-    DoubleListNode  header;     /* dummy header of double list */
-    nodeFree        deNode;     /* free memory of node */
-    int             nodeCnt;    /* count of all nodes */
+    DoubleListNode      header;     /* dummy header of double list */
+    doubleListNodeFree  deNode;     /* free memory of node */
+    int                 nodeCnt;    /* count of all nodes */
 };
 
 
@@ -71,7 +71,7 @@ struct doubleList
 #define initDoubleList(doubleListPtr, deNodeFunc)   \
     do {                                            \
         DoubleList *__idl_dlp = (doubleListPtr);    \
-        nodeFree __idl_dnf = (deNodeFunc);          \
+        doubleListNodeFree __idl_dnf = (deNodeFunc);\
         /* initialize dummy header */               \
         initDoubleListNode(&__idl_dlp->header);     \
         __idl_dlp->header.doubleList = __idl_dlp;   \
@@ -228,7 +228,7 @@ struct doubleList
 #define destoryDoubleList(doubleListPtr, freeDoubleList)        \
     do {                                                        \
         DoubleList      *__ddl_dlp = (doubleListPtr);           \
-        nodeFree        __ddl_dnf = __ddl_dlp->deNode;          \
+        doubleListNodeFree  __ddl_dnf = __ddl_dlp->deNode;      \
         DoubleListNode  *__ddl_dlpn = __ddl_dlp->header.next;   \
         while(!isDoubleListSentinel(__ddl_dlpn)) {              \
             removeDoubleListNode(__ddl_dlpn);                   \

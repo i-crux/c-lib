@@ -32,6 +32,15 @@ Stack *stackCreate(int eSize);
 
 #define stackPop arrayPop
 
+/**
+ * @brief get the pointor of data at top of [Stack]
+ * 
+ * @param stack: pointor of [Stack]
+ * 
+ * @return pointor of data at the top of [Stack], NULL on empty stack
+ */
+void *stackPeek(Stack *stack);
+
 #define stackDestroy arrayDestroy
 
 #endif /* _STACK_H_ */

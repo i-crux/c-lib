@@ -2,6 +2,7 @@
 #define _TEST_H_
 
 #include <stdio.h>
+#include <assert.h>
 
 #define _TEST_BEGIN()                                           \
     do {                                                        \

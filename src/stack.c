@@ -12,3 +12,8 @@ bool stackInit(Stack *stack, int eSize) {
 Stack *stackCreate(int eSize) {
     return arrayCreate(eSize, _INIT_STACK_SIZE, NULL);
 }
+
+
+void *stackPeek(Stack *stack) {
+    return arrayGetElem(stack, arrayElemCnt(stack) - 1);
+}

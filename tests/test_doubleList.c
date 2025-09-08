@@ -4,7 +4,7 @@
 #include "test.h"
 #include "doubleList.h"
 
-static void _deNodeFuncDummy(DoubleListNode *p) {
+static void _deNodeFuncDummy(void *p) {
     printf("free(%p)\n", p);
     free(p);
 }

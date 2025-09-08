@@ -63,6 +63,25 @@ static inline void test_stackCreate() {
 }
 
 
+static inline void test_stackPeek() {
+    _TEST_BEGIN();
+
+    int *a;
+
+    Stack *stack = stackCreate(sizeof(int));
+    assert(stack);
+
+    for(int i; i < 1000; i++) {
+        stackPush(stack, &i);
+        a = stackPeek(stack);
+        assert(*a == i);
+    }
+
+    stackDestroy(stack, 1);
+    _TEST_END();
+}
+
+
 int main(void) {
 
     test_stackInit();
