@@ -2,6 +2,7 @@
     "files.associations": {
         "type_traits": "c",
         "compare": "c",
-        "test.h": "c"
+        "test.h": "c",
+        "tools.h": "c"
     }
 }

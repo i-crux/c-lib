@@ -6,7 +6,7 @@
 typedef struct doubleList DoubleList;
 typedef struct doubleListNode DoubleListNode;
 typedef void (*doubleListNodeFree)(void *node);
-typedef void (*visitFunc)(DoubleListNode *node);
+typedef void (*doubleListNodeVisitFunc)(DoubleListNode *node);
 
 /*
  * structure of double list node
@@ -207,23 +207,23 @@ struct doubleList
  * @param doubleListPtr: pointor of a Double list
  * @param func: visit function
  */
-#define travalDoubleList(doubleListPtr, func)                   \
-    do {                                                        \
-        DoubleList *__tdl_dlp = (DoubleList *)(doubleListPtr);  \
-        visitFunc  __tdl_func = (visitFunc)(func);              \
-        DoubleListNode *__tdl_dlnp = __tdl_dlp->header.next;    \
-        while(!isDoubleListSentinel(__tdl_dlnp)) {              \
-            __tdl_func(__tdl_dlnp);                             \
-            __tdl_dlnp = __tdl_dlnp->next;                      \
-        }                                                       \
+#define travalDoubleList(doubleListPtr, func)                                   \
+    do {                                                                        \
+        DoubleList *__tdl_dlp = (DoubleList *)(doubleListPtr);                  \
+        doubleListNodeVisitFunc  __tdl_func = (doubleListNodeVisitFunc)(func);  \
+        DoubleListNode *__tdl_dlnp = __tdl_dlp->header.next;                    \
+        while(!isDoubleListSentinel(__tdl_dlnp)) {                              \
+            __tdl_func(__tdl_dlnp);                                             \
+            __tdl_dlnp = __tdl_dlnp->next;                                      \
+        }                                                                       \
     } while(0)
 
 /**
  * @brief destory a double list, if [doubleList->deNode] != NULL, call [deNode]
  * WARNING: if free(doubleListPtr),  [doubleListPtr] will NOT set to NULL
  * 
- * @param doubleListPtr: pointor to a double list
- * @param freeDoubleList: if true, free DoubleList Structure
+ * @param dl: pointor to a double list
+ * @param freeSelf: if true, free DoubleList Structure
  */
 #define destoryDoubleList(doubleListPtr, freeDoubleList)        \
     do {                                                        \
@@ -241,5 +241,23 @@ struct doubleList
             FREE(__ddl_dlp);                                    \
         }                                                       \
     } while(0)
+
+/*
+void destoryDoubleList(DoubleList *dl, bool freeSelf);
+
+void destoryDoubleList(DoubleList *dl, bool freeSelf) {
+    DoubleListNode *dln = dl->header.next;
+    while(!isDoubleListSentinel(dln)) {
+        removeDoubleListNode(dln);
+        if(dl->deNode) {
+            dl->deNode(dln);
+        }
+        dln = dl->header.next;
+    }
+    if(freeSelf) {
+        FREE(dl);
+    }
+}
+*/
 
 #endif /* _DOUBLE_LIST_H_ */

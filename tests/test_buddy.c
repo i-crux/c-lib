@@ -23,6 +23,8 @@ static void _visit(DoubleListNode *dlnp) {
 
 static void test_Buddy() {
     _TEST_BEGIN();
+
+    srand(time(NULL));
     size_t  size = 4096;
     uint8_t magic = 0x84;
     Buddy *bp;

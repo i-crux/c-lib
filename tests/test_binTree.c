@@ -41,6 +41,7 @@ static inline void test_binTreeNodeDataCreate() {
     btndp = binTreeNodeDataCreate(sizeof(int), &intData);
     assert(btndp);
     assert(*(int *)(btndp->data) == intData);
+    assert(btndp->dataSize == sizeof(int));
     FREE(btndp);
 
     btndp = binTreeNodeDataCreate(sizeof(__STR_DATA), strData);
@@ -72,6 +73,7 @@ static inline void test_binTreeNodeCreate() {
     assert(btnp->parent == NULL);
     assert(btnp->property == 0);
     assert(btnp->dlist.deNode == FREE);
+    assert(btnp->keySize == sizeof(int));
     FREE(btnp);
 
     btnp = binTreeNodeCreate(0, sizeof(char *), &strKey, __freeDummy, free);
@@ -85,7 +87,9 @@ static inline void test_binTreeNodeCreate() {
     assert(btnp->dlist.deNode == __freeDummy);
     printf("%s\n", *(char **)(btnp->key));
     btnp->freeKey(*(char **)(btnp->key));
+    assert(btnp->keySize == sizeof(char *));
     FREE(btnp);
+    
 
     _TEST_END();
 }

@@ -19,13 +19,13 @@ struct binTreeNodeStruct
     uintptr_t           property;       /* some property for the TreeNode, could using for RBtree, AVLtree */
     DoubleList          dlist;          /* data list, deal with same key */
     binTreeNodeFreeKey  freeKey;
-    /* size_t              keySize; */       /* size of key */
+    size_t              keySize;        /* size of key */
     uint8_t             key[1];
 };
 
 typedef struct {
     DoubleListNode  dln;
-    /* size_t          dataSize; */
+    size_t          dataSize;
     uint8_t         data[1];
 } BinTreeNodeData;
 

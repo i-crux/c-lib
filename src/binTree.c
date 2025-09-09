@@ -31,6 +31,7 @@ BinTreeNodeData *binTreeNodeDataCreate(size_t dataSize, void *data) {
     initDoubleListNode(&btnd->dln);
 
     memcpy(btnd->data, data, dataSize);
+    btnd->dataSize = dataSize;
 
     return btnd;
 }
@@ -52,6 +53,7 @@ BinTreeNode *binTreeNodeCreate(uintptr_t property, size_t keySize, void *key,
     btn->property = property;
     btn->freeKey = freeKey;
     memcpy(btn->key, key, keySize);
+    btn->keySize = keySize;
 
     btn->parent = btn->left = btn->right = NULL;
 
@@ -185,6 +187,7 @@ bool binTreeTravalPostorder(BinTree *binTree, binTreeNodeVisit binTreeNodeVisit)
             stackPop(stack, &btn);
             binTreeNodeVisit(btn);
             lastVisited = btn;
+            btn = NULL; /* already visited. drop it */
         }
     }
 
