@@ -40,7 +40,7 @@ static void __visitBstNodeStrKey(BinTreeNode *btn) {
     printf("\n");
 }
 
-// static void __visitBstNodeIntKey(BinTreeNode *btn) {
+// static __attribute__((maybe_unused)) void __visitBstNodeIntKey(BinTreeNode *btn) {
 //     printf("%d(%p %p %p %p): ", *((int *)btn->key), btn, btn->parent, btn->left, btn->right);
 //     travalDoubleList(&btn->dlist, __visitDlNode);
 //     printf("\n");
@@ -98,7 +98,7 @@ static void __postorder(BinTreeNode *btn,  binTreeNodeVisit visit) {
 }
 
 
-#define __ARR_MAX_SIZE 32
+#define __ARR_MAX_SIZE 1024
 #define __MAX_INT_KEY  __INT_MAX__
 #define __ARR_MAX_SIZE_PVP 65535
 
@@ -254,11 +254,83 @@ static inline void test_bstSearch() {
     _TEST_END();
 }
 
+static inline void test_bstDelete() {
+    _TEST_BEGIN();
+    srand(time(NULL));
+
+    BinTree *bt;
+    BinTreeNode *btn;
+    int arrSize, keyArr[__ARR_MAX_SIZE * 2];
+
+    bt = binTreeCreate(bstIntKeyCmp, 0);
+
+    arrSize = rand() % __ARR_MAX_SIZE;
+    printf("arrSize: %d\n", arrSize);
+    int btSize = 0;
+    for(int i = 0; i < arrSize; i++) {
+        keyArr[i] = rand() % __MAX_INT_KEY;
+        btn = binTreeNodeCreate(0, sizeof(char *), keyArr + i, FREE, NULL);
+        int res = bstInsert(bt, btn);
+        assert(res >= 0); 
+        if(res == 0) {
+            btSize++;
+        }
+    }
+
+    assert(bt->size == btSize);
+    // binTreeTravalInorder(bt, __visitBstNodeIntKey);
+    // printf("==================\n");
+    for(int i = arrSize; i < arrSize * 2; i++) {
+        keyArr[i] = rand() % __MAX_INT_KEY;
+    }
+    printf("keyArr: ");
+    for(int i = 0; i < arrSize * 2-1; i++) {
+        printf("%d(%d), ", keyArr[i], i);
+        
+        btn = bstDelete(bt, keyArr+i);
+        if (i < arrSize) {
+            assert(btn);
+            assert(*((int *)(btn->key)) == keyArr[i]);
+            assert(bt->size == --btSize);
+            // binTreeTravalInorder(bt, __visitBstNodeIntKey); 
+            // printf("==================\n");
+        } else {
+            assert(btn == NULL);
+        }
+    }
+    printf("\n");
+
+    arrSize = rand() % __ARR_MAX_SIZE;
+    printf("arrSize: %d\n", arrSize);
+    btSize = 0;
+    for(int i = 0; i < arrSize; i++) {
+        keyArr[i] = rand() % __MAX_INT_KEY;
+        btn = binTreeNodeCreate(0, sizeof(char *), keyArr + i, FREE, NULL);
+        int res = bstInsert(bt, btn);
+        assert(res >= 0); 
+        if(res == 0) {
+            btSize++;
+        }
+    }
+
+    while(bt->size != 0) {
+        int idx = rand() % arrSize;
+        btn = bstDelete(bt, keyArr+idx);
+        if(btn) {
+            assert(bt->size == --btSize);
+        }
+    }
+
+    binTreeDestory(bt, 1);
+    _TEST_END();
+}
+
 
 int main(void) {
 
     test_bstInsert();
     test_bstSearch();
+    test_bstDelete();
 
     return 0;
 }

@@ -72,6 +72,29 @@ _done:
     return btn;
 }
 
+/**
+ * @brief connect parent[p] and child[c]
+ * 
+ * @param t: pointor to [BinTree]
+ * @param p: parent [BinTreeNode] pointor
+ * @param c: child [BinTreeNode] pointor
+ * @param fc: former child of parent[p]
+ */
+#define _connChild(t, p, c, fc)                                                         \
+    do {                                                                                \
+        BinTree *__cc_bt = (t);                                                         \
+        BinTreeNode *__cc_parent = (p), *__cc_child = (c);                              \
+        BinTreeNode *__cc_formerChild = (fc);                                           \
+        if(__cc_parent) {                                                               \
+            __cc_parent->left == __cc_formerChild ? (__cc_parent->left = __cc_child) :  \
+                                                    (__cc_parent->right = __cc_child);  \
+        } else {                                                                        \
+            __cc_bt->root = __cc_child;                                                 \
+        }                                                                               \
+        if(__cc_child) {                                                                \
+            __cc_child->parent = __cc_parent;                                           \
+        }                                                                               \
+    } while(0)
 
 BinTreeNode *bstDelete(BinTree *bt, void *key) {
     BinTreeNode *btn = bstSearch(bt, key), *parent, *child, *successor;
@@ -80,35 +103,38 @@ BinTreeNode *bstDelete(BinTree *bt, void *key) {
         goto _done;
     }
 
-    parent = btn->parent;
 
     if(!btn->left || !btn->right) {
+        parent = btn->parent;
         /* one child the [btn] has at most */
         child = btn->left ? btn->left : btn->right;
-        if(parent) {
-            parent->left == btn ? (parent->left = child, 0) : (parent->right = child, 1);
-        } else {    /* root */
-            bt->root = child;
-        }
-        if(child) {
-            child->parent = parent;
-        }
+    
+        _connChild(bt, parent, child, btn);
+        
     } else {    /* btn->left != NULL && btn->right != NULL */
+        /* get the successor of [btn] */
         successor = btn->right;
+        
         while(successor->left) {
             successor = successor->left;
         }
+
+        /* remove successor from the [BST] */
         parent = successor->parent;
+        /* if [btn] has child, only [right] child */
         child = successor->right;
-        /* succesor always be the left child of parent, but the parent is [btn] */
-        parent->left == successor ? (parent->left = child, 0) : (parent->right = child, 1);
-        if(child) {
-            child->parent = parent;
-        }
+        _connChild(bt, parent, child, successor);
+
         successor->parent = btn->parent;
         successor->left = btn->left;
+        if(successor->left) {successor->left->parent = successor;}
         successor->right = btn->right;
+        if(successor->right) {successor->right->parent = successor;}
         successor->property = btn->property;
+
+        parent = btn->parent;
+        child = successor;
+        _connChild(bt, parent, child, btn);
     }
     bt->size--;
     btn->property = 0;
