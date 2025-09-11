@@ -292,6 +292,7 @@ static inline void test_bstDelete() {
             assert(btn);
             assert(*((int *)(btn->key)) == keyArr[i]);
             assert(bt->size == --btSize);
+            FREE(btn);
             // binTreeTravalInorder(bt, __visitBstNodeIntKey); 
             // printf("==================\n");
         } else {
@@ -318,6 +319,7 @@ static inline void test_bstDelete() {
         btn = bstDelete(bt, keyArr+idx);
         if(btn) {
             assert(bt->size == --btSize);
+            FREE(btn);
         }
     }
 
