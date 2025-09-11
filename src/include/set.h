@@ -2,7 +2,7 @@
 #define _SET_H_
 
 /*
- * nonordered set Implemented by hash and double list
+ * unordered set Implemented by hash and double list
  */
 
 

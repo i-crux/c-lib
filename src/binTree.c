@@ -24,13 +24,17 @@ BinTree *binTreeCreate(binTreeElemCmp cmp, bool allowSameKey) {
 }
 
 BinTreeNodeData *binTreeNodeDataCreate(size_t dataSize, void *data) {
-    BinTreeNodeData *btnd = MALLOC(sizeof(BinTreeNodeData) + dataSize - 1);
-    
+    BinTreeNodeData *btnd;
+
+    dataSize = dataSize <= 1 ? 1 : dataSize;
+
+    btnd = MALLOC(sizeof(BinTreeNodeData) + dataSize - 1);
     ckpvThenReturn(btnd, NULL, NULL);
 
     initDoubleListNode(&btnd->dln);
-
-    memcpy(btnd->data, data, dataSize);
+    if(data) {
+        memcpy(btnd->data, data, dataSize);
+    }
     btnd->dataSize = dataSize;
 
     return btnd;
@@ -39,7 +43,11 @@ BinTreeNodeData *binTreeNodeDataCreate(size_t dataSize, void *data) {
 BinTreeNode *binTreeNodeCreate(uintptr_t property, size_t keySize, void *key, 
                                doubleListNodeFree deNode, binTreeNodeFreeKey freeKey)
 {
-    BinTreeNode *btn = MALLOC(sizeof(BinTreeNode) + keySize - 1);
+    BinTreeNode *btn;
+
+    keySize = keySize < 1 ? 1 : keySize;
+
+    btn = MALLOC(sizeof(BinTreeNode) + keySize - 1);
 
     ckpvThenReturn(btn, NULL, NULL);
 
@@ -52,7 +60,11 @@ BinTreeNode *binTreeNodeCreate(uintptr_t property, size_t keySize, void *key,
 
     btn->property = property;
     btn->freeKey = freeKey;
-    memcpy(btn->key, key, keySize);
+
+    if(key) {
+        memcpy(btn->key, key, keySize);
+    }
+    
     btn->keySize = keySize;
 
     btn->parent = btn->left = btn->right = NULL;

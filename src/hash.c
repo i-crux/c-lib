@@ -30,13 +30,17 @@ _done:
 
 
 HashNode *hashNodeCreate(uintptr_t key, size_t dataSize, void *data) {
-    HashNode *hn = MALLOC(sizeof(HashNode) + dataSize - 1);
+    HashNode *hn;
+    dataSize = dataSize <= 1 ? 1 : dataSize;
+    hn = MALLOC(sizeof(HashNode) + dataSize - 1);
 
     ckpvThenReturn(hn, NULL, NULL);
 
     initDoubleListNode(&hn->dln);
 
-    memcpy(hn->data, data, dataSize);
+    if(data) {
+        memcpy(hn->data, data, dataSize);
+    } 
 
     hn->dataSize = dataSize;
     hn->key = key;
