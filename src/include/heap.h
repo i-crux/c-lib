@@ -3,4 +3,13 @@
 
 #include "array.h"
 
+/*
+ * - child
+ * - parent
+ * - siftDown
+ * - siftUp
+ * - replace
+ * - heapify
+ */
+
 #endif /* _HEAP_H_ */
