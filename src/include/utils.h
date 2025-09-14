@@ -220,21 +220,24 @@ typedef struct {
 
 /**
  * @brief swap two memory 
+ * IMPORTANT: [ma] must not equal [mb]
  * 
  * @param ma pointor to the first memory
  * @param mb pointor to the 2nd memory
  * @param size memory size 
  */
-#define swapMem(ma, mb, size)                                                   \
-    do {                                                                        \
-        size_t __smxor_size = (size_t)(size);                                   \
-        uint8_t *__smxor_a = (uint8_t *)(ma);                                   \
-        uint8_t *__smxor_b = (uint8_t *)(mb);                                   \
-        for(size_t __smxor_i = 0; __smxor_i < __smxor_size; __smxor_i++) {      \
-            __smxor_a[__smxor_i] = __smxor_a[__smxor_i] ^ __smxor_b[__smxor_i]; \
-            __smxor_b[__smxor_i] = __smxor_a[__smxor_i] ^ __smxor_b[__smxor_i]; \
-            __smxor_a[__smxor_i] = __smxor_a[__smxor_i] ^ __smxor_b[__smxor_i]; \
-        }                                                                       \
+#define swapMem(ma, mb, size)                                                       \
+    do {                                                                            \
+        size_t __smxor_size = (size_t)(size);                                       \
+        uint8_t *__smxor_a = (uint8_t *)(ma);                                       \
+        uint8_t *__smxor_b = (uint8_t *)(mb);                                       \
+        if( __smxor_a != __smxor_b ) {                                              \
+            for(size_t __smxor_i = 0; __smxor_i < __smxor_size; __smxor_i++) {      \
+                __smxor_a[__smxor_i] = __smxor_a[__smxor_i] ^ __smxor_b[__smxor_i]; \
+                __smxor_b[__smxor_i] = __smxor_a[__smxor_i] ^ __smxor_b[__smxor_i]; \
+                __smxor_a[__smxor_i] = __smxor_a[__smxor_i] ^ __smxor_b[__smxor_i]; \
+            }                                                                       \
+        }                                                                           \
     } while(0)
 
 /**

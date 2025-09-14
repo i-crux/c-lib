@@ -11,5 +11,6 @@
  * - replace
  * - heapify
  */
+#define Heap Array
 
 #endif /* _HEAP_H_ */
