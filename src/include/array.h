@@ -249,6 +249,29 @@ void arrayDestroy(Array *arr, bool freeSelf);
     }                                                                                                          \
     _res_arrayIsSortedAsc; })
 
+/**
+ * @brief check [Array] is ordered or not
+ * @param arr: pointor of [Array]
+ * @return 1 when ordered; 0 otherwise
+ */
+#define arrayIsSortedDesc(arr) ({                                                                               \
+    bool _res_arrayIsSortedAsc = 0;                                                                            \
+    Array *_a_arrayIsSortedAsc = (arr);                                                                        \
+    if ( _a_arrayIsSortedAsc->compare ) {                                                                      \
+        _res_arrayIsSortedAsc = 1;                                                                             \
+        for(int _i_arrayIsSortedAsc = 0;                                                                       \
+            _i_arrayIsSortedAsc < arrayElemCnt(_a_arrayIsSortedAsc) - 1; _i_arrayIsSortedAsc++)                \
+        {                                                                                                      \
+            if ( _a_arrayIsSortedAsc->compare(arrayGetAddr(_a_arrayIsSortedAsc, _i_arrayIsSortedAsc),          \
+                                           arrayGetAddr(_a_arrayIsSortedAsc, _i_arrayIsSortedAsc + 1)) < 0)    \
+            {                                                                                                  \
+                _res_arrayIsSortedAsc = 0;                                                                     \
+                break;                                                                                         \
+            }                                                                                                  \
+        }                                                                                                      \
+    }                                                                                                          \
+    _res_arrayIsSortedAsc; })
+
 
 /**
  * @brief swap two element in a [Array]

@@ -106,6 +106,26 @@ static inline void test_arraySort() {
     for (int i = 0; i < 100; i++) {
         int size = rand() % 100000 + 1;
         arr = genIntArray(size, 0);
+
+        int key = rand();
+        ((int *)(arr->data))[0] = key;
+
+        assert(arr);
+        _measureBegin();
+        arrayHeapSort(arr);
+        _measureEnd(arrayHeapSort, size);
+        assert(arrayIsSortedAsc(arr));
+
+        void *p = arrayBinSearch(arr, &key);
+        assert(p);
+
+        FREE(arr);
+    }
+
+    printf("========================\n\n");
+    for (int i = 0; i < 100; i++) {
+        int size = rand() % 100000 + 1;
+        arr = genIntArray(size, 0);
         assert(arr);
         _measureBegin();
         int k = rand() % size;

@@ -58,6 +58,13 @@ void arrayQuickSort3way(Array *arr);
 
 
 /**
+ * @brief sort a [Array] using heap sort
+ * @param arr: pointor to [Array]
+ */
+void arrayHeapSort(Array *arr);
+
+
+/**
  * @brief get the kth element of Array
  * @param arr: pointor to [Array]
  * @param k: kth

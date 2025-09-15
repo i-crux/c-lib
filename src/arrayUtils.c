@@ -1,4 +1,5 @@
 #include "arrayUtils.h"
+#include "heap.h"
 
 
 void arrayInsertionSortIdx(Array *arr, const int begin, const int end) {
@@ -298,6 +299,27 @@ void arrayQuickSort3way(Array *arr) {
     }
     __doQuickSort3way(arr, 0, arrayElemCnt(arr) - 1);
 }
+
+
+void arrayHeapSort(Array *arr) {
+    int cnt;
+
+    if(!arr || !arr->compare) {
+        return;
+    }
+
+    cnt = arrayElemCnt(arr);
+
+    heapHeapify(arr);
+
+    while(!heapEmpyt(arr)) {
+        arraySwapElem(arr, 0, arrayElemCnt(arr) - 1);
+        arrayDecIdx(arr);
+        heapSiftDown(arr, 0);
+    }
+    arr->nextIndex = cnt;
+}
+
 
 
 void *arraySelectKthElemet(Array *arr, int k) {
