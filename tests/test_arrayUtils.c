@@ -6,6 +6,8 @@
 static inline void test_arraySort() {
     _TEST_BEGIN();
 
+    srand(time(NULL));
+
     Array *arr = genIntArray(10000, 1);
     assert(arr);
     assert(arrayIsSortedAsc(arr));
@@ -26,6 +28,43 @@ static inline void test_arraySort() {
     _measureEnd(arraySelectionSort, 10000);
     assert(arrayIsSortedAsc(arr));
     FREE(arr);
+
+
+    for (int i = 0; i < 100; i++) {
+        int size = rand() % 100000 + 1;
+        arr = genIntArray(size, 0);
+
+        int key = rand();
+        ((int *)(arr->data))[0] = key;
+
+        assert(arr);
+        _measureBegin();
+        arrayShellSort(arr);
+        _measureEnd(arrayShellSort, size);
+        assert(arrayIsSortedAsc(arr));
+        FREE(arr);
+
+    }
+    printf("========================\n\n");
+
+    for (int i = 0; i < 200; i++) {
+        int size = rand() % 5000 + 1;
+        arr = genIntArray(size, 0);
+
+        int key = rand();
+        ((int *)(arr->data))[0] = key;
+
+        assert(arr);
+        _measureBegin();
+        arrayBubbleSort(arr);
+        _measureEnd(arrayBubbleSort, size);
+        assert(arrayIsSortedAsc(arr));
+        FREE(arr);
+
+    }
+    printf("========================\n\n");
+
+
 
     for (int i = 0; i < 100; i++) {
         int size = rand() % 100000 + 1;
@@ -129,8 +168,10 @@ static inline void test_arraySort() {
         assert(arr);
         _measureBegin();
         int k = rand() % size;
+        void *e1 = arraySelectKthElemet(arr, 0);
+        void *e2 = arraySelectKthElemet(arr, size-1);
         void *e = arraySelectKthElemet(arr, k);
-        printf("the %dth [%d]  ", k, *(int *)e);
+        printf("the %dth [%d]  size: %d, %d[0], %d[size]", k, *(int *)e, size, *(int *)e1, *(int *)e2);
         _measureEnd(arraySelectKthElemet, size);
         FREE(arr);
     }

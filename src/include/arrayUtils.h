@@ -3,6 +3,10 @@
 
 #include "array.h"
 
+/* 
+ * bubble sort with optimized
+ * shell sort(length of step)
+ */
 
 #define ARRAY_INSERTION_SORT_SIZE 10
 
@@ -27,6 +31,20 @@ void arrayInsertionSort(Array *arr);
  * @param arr: pointor to [Array]
  */
 void arraySelectionSort(Array *arr);
+
+
+/**
+ * @brief sort a [Array] using selection
+ * @param arr: pointor to [Array]
+ */
+void arrayBubbleSort(Array *arr);
+
+
+/**
+ * @brief sort a [Array] using selection
+ * @param arr: pointor to [Array]
+ */
+void arrayShellSort(Array *arr);
 
 
 /**

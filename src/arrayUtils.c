@@ -43,6 +43,79 @@ void arraySelectionSort(Array *arr) {
 }
 
 
+void arrayBubbleSort(Array *arr) {
+    int cnt;
+    int chidx;
+
+    if(!arr || !arr->compare) {
+        return;
+    }
+
+    cnt = arrayElemCnt(arr);
+
+    /* arr->data[cnt-i, cnt) is already sorted */
+    for(int i = 0; i < cnt - 1; /* void */) {
+        chidx = 0;
+        for(int j = 0; j < cnt - i - 1; j++) {
+            if(arr->compare(arrayGetElem(arr, j), arrayGetElem(arr, j+1)) > 0) {
+                arraySwapElem(arr, j, j+1);
+                chidx = j+1;
+            }
+        }
+        i = cnt - chidx - 1;
+    }
+}
+
+
+/**
+ * @brief get the started value of [h] in shell sort
+ * @param arrlen: length of [Array]
+ * @return begin [h] for shell sort
+ */
+#define _shellBeginH(arrLen)                        \
+    ({                                              \
+        int __sbh_al = (arrLen) / 2, __sbh_ret = 1; \
+        while(__sbh_ret < __sbh_al) {               \
+            __sbh_ret = __sbh_ret * 3 + 1;          \
+        }                                           \
+        __sbh_ret;                                  \
+    })
+
+
+/**
+ * @brief get next [h] for shell sort
+ * @param h: current value of [h]
+ * @return next [h] for shell sort
+ */
+#define _shellNextH(h)      \
+    ({                      \
+        int __snh_h = (h);  \
+        __snh_h / 3;        \
+    })
+
+
+void arrayShellSort(Array *arr) {
+    int arrLen;
+
+    if(!arr || !arr->compare) {
+        return;
+    }
+
+    arrLen = arrayElemCnt(arr);
+
+    for(int step = _shellBeginH(arrLen); step >= 1; step = _shellNextH(step)) {
+        for(int i = 0; i < arrLen - step; i++) {
+            for(int j = i + step; 
+                j >= step && arr->compare(arrayGetElem(arr, j), arrayGetElem(arr, j - step)) < 0; 
+                j -= step) 
+            {
+                arraySwapElem(arr, j, j - step);
+            }
+        }
+    }
+}
+
+
 /**
  * @brief merge arr[begin, mid], arr[mid+1, end]
  * 
@@ -333,7 +406,7 @@ void *arraySelectKthElemet(Array *arr, int k) {
     l = 0; 
     r = arrayElemCnt(arr) - 1;
 
-    if( k <= 0 || k > r ) {
+    if( k < 0 || k > r ) {
         goto _done;
     }
 

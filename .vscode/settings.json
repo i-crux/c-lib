@@ -3,6 +3,7 @@
         "type_traits": "c",
         "compare": "c",
         "test.h": "c",
-        "tools.h": "c"
+        "tools.h": "c",
+        "random": "c"
     }
 }

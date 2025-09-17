@@ -218,6 +218,16 @@ typedef struct {
         memcpy(__sm_b, (void *)__sm_tmp, __sm_size);                \
     } while(0)
 
+#define swapValue(a, b)         \
+    do {                        \
+        if ((a) != (b) ) {      \
+            (a) = (a) ^ (b);    \
+            (b) = (a) ^ (b);    \
+            (a) = (a) ^ (b);    \
+        }                       \
+    } while(0)
+
+    
 /**
  * @brief swap two memory 
  * IMPORTANT: [ma] must not equal [mb]
@@ -233,9 +243,7 @@ typedef struct {
         uint8_t *__smxor_b = (uint8_t *)(mb);                                       \
         if( __smxor_a != __smxor_b ) {                                              \
             for(size_t __smxor_i = 0; __smxor_i < __smxor_size; __smxor_i++) {      \
-                __smxor_a[__smxor_i] = __smxor_a[__smxor_i] ^ __smxor_b[__smxor_i]; \
-                __smxor_b[__smxor_i] = __smxor_a[__smxor_i] ^ __smxor_b[__smxor_i]; \
-                __smxor_a[__smxor_i] = __smxor_a[__smxor_i] ^ __smxor_b[__smxor_i]; \
+                swapValue(__smxor_a[__smxor_i], __smxor_b[__smxor_i]);              \
             }                                                                       \
         }                                                                           \
     } while(0)
