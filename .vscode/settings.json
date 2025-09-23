@@ -4,6 +4,8 @@
         "compare": "c",
         "test.h": "c",
         "tools.h": "c",
-        "random": "c"
+        "random": "c",
+        "bst.h": "c",
+        "bintree.h": "c"
     }
 }

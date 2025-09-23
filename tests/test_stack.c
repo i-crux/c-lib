@@ -3,10 +3,10 @@
 #include "test.h"
 #include "stack.h"
 
-
-static inline void test_stackInit() {
+static inline void test_stackInit()
+{
     _TEST_BEGIN();
-    
+
     Stack stack;
     assert(stackInit(&stack, sizeof(int)));
 
@@ -16,7 +16,7 @@ static inline void test_stackInit() {
     assert(stack.initCapacity == 128);
     assert(stack.elemSize == sizeof(int));
     assert(stack.search != NULL);
-    assert(stack.nextIndex==0);
+    assert(stack.nextIndex == 0);
 
     stackDestroy(&stack, 0);
 
@@ -26,12 +26,13 @@ static inline void test_stackInit() {
     assert(stack.initCapacity == 0);
     assert(stack.elemSize == 0);
     assert(stack.search == 0);
-    assert(stack.nextIndex==0);
+    assert(stack.nextIndex == 0);
 
     _TEST_END();
 }
 
-static inline void test_stackCreate() {
+static inline void test_stackCreate()
+{
     _TEST_BEGIN();
 
     int a = 1;
@@ -53,17 +54,17 @@ static inline void test_stackCreate() {
     assert(arrayGetAddr(stack, 0) == stack->data);
     assert(arrayGetElem(stack, 0) == NULL);
     assert(!arraySetElem(stack, 0, &a));
-    
+
     assert(stack->search != NULL);
-    assert(stack->nextIndex==0);
+    assert(stack->nextIndex == 0);
 
     stackDestroy(stack, 1);
 
     _TEST_END();
 }
 
-
-static inline void test_stackPeek() {
+static inline void test_stackPeek()
+{
     _TEST_BEGIN();
 
     int *a;
@@ -71,7 +72,8 @@ static inline void test_stackPeek() {
     Stack *stack = stackCreate(sizeof(int));
     assert(stack);
 
-    for(int i; i < 1000; i++) {
+    for (int i; i < 1000; i++)
+    {
         stackPush(stack, &i);
         a = stackPeek(stack);
         assert(*a == i);
@@ -81,8 +83,8 @@ static inline void test_stackPeek() {
     _TEST_END();
 }
 
-
-int main(void) {
+int main(void)
+{
 
     test_stackInit();
     test_stackCreate();

@@ -1,9 +1,11 @@
 #include "singleList.h"
 
-SingleList *singleListReverse(SingleList *list) {
+SingleList *singleListReverse(SingleList *list)
+{
     SingleList *cur = list, *res = list;
 
-    if(list && list->next) {
+    if (list && list->next)
+    {
         cur = singleListReverse(list->next);
         list->next->next = list;
         list->next = NULL;
@@ -13,12 +15,14 @@ SingleList *singleListReverse(SingleList *list) {
     return res;
 }
 
-
-void singleListDestory(SingleList *list, singleListFree func) {
-    if(list) {
+void singleListDestory(SingleList *list, singleListFree func)
+{
+    if (list)
+    {
         singleListDestory(list->next, func);
         list->next = NULL;
-        if(func) {
+        if (func)
+        {
             func(list);
         }
     }

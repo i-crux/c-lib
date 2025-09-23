@@ -1,24 +1,27 @@
 #include "singleList.h"
 #include "test.h"
 
-typedef struct {
-    SingleList  l;
-    int         key;
+typedef struct
+{
+    SingleList l;
+    int key;
 } _SListData;
 
-
-void __free(void *p) {
+void __free(void *p)
+{
     _SListData *sld = p;
     printf("key = %d\n", sld->key);
     FREE(sld);
 }
 
-void __visit(SingleList *p) {
+void __visit(SingleList *p)
+{
     _SListData *sld = containerOf(p, _SListData, l);
     printf("key = %d\n", sld->key);
 }
 
-static inline void test_singleListInitCreate() {
+static inline void test_singleListInitCreate()
+{
     _TEST_BEGIN();
 
     SingleList *l = singleListCreate();
@@ -29,7 +32,8 @@ static inline void test_singleListInitCreate() {
     _TEST_END();
 }
 
-static inline void test_singleListAddDelete() {
+static inline void test_singleListAddDelete()
+{
     _TEST_BEGIN();
 
     SingleList *l1, *l2, *l3, *h;
@@ -55,17 +59,17 @@ static inline void test_singleListAddDelete() {
 
     singleListDestory(h, FREE);
 
-
     _TEST_END();
 }
 
-
-static inline void test_singleListAppendReverse() {
+static inline void test_singleListAppendReverse()
+{
     _TEST_BEGIN();
     _SListData *lds[6];
     SingleList *h1, *h2;
 
-    for( int i = 0; i < 6; i++) {
+    for (int i = 0; i < 6; i++)
+    {
         lds[i] = MALLOC(sizeof(_SListData));
         singleListInit(&lds[i]->l);
         lds[i]->key = i;
@@ -94,7 +98,7 @@ static inline void test_singleListAppendReverse() {
     printf("split ----------\n");
 
     singleListDestory(h1, __free);
-    if(h1 != h2) 
+    if (h1 != h2)
         singleListDestory(h2, __free);
 
     printf("destory ------------\n");
@@ -102,9 +106,8 @@ static inline void test_singleListAppendReverse() {
     _TEST_END();
 }
 
-
-
-int main(void) {
+int main(void)
+{
 
     test_singleListInitCreate();
     test_singleListAddDelete();

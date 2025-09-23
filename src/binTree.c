@@ -3,27 +3,27 @@
 #include "queue.h"
 #include "stack.h"
 
-
-
-void binTreeInit(BinTree *binTree, binTreeElemCmp cmp, bool allowSameKey) {
+void binTreeInit(BinTree *binTree, binTreeElemCmp cmp, bool allowSameKey)
+{
     binTree->cmp = cmp;
     binTree->root = NULL;
     binTree->size = 0;
     binTree->allowSameKey = allowSameKey;
 }
 
-
-BinTree *binTreeCreate(binTreeElemCmp cmp, bool allowSameKey) {
+BinTree *binTreeCreate(binTreeElemCmp cmp, bool allowSameKey)
+{
     BinTree *bt = MALLOC(sizeof(BinTree));
 
     ckpvThenReturn(bt, NULL, NULL);
 
     binTreeInit(bt, cmp, allowSameKey);
-    
+
     return bt;
 }
 
-BinTreeNodeData *binTreeNodeDataCreate(size_t dataSize, void *data) {
+BinTreeNodeData *binTreeNodeDataCreate(size_t dataSize, void *data)
+{
     BinTreeNodeData *btnd;
 
     dataSize = dataSize <= 1 ? 1 : dataSize;
@@ -32,7 +32,8 @@ BinTreeNodeData *binTreeNodeDataCreate(size_t dataSize, void *data) {
     ckpvThenReturn(btnd, NULL, NULL);
 
     initDoubleListNode(&btnd->dln);
-    if(data) {
+    if (data)
+    {
         memcpy(btnd->data, data, dataSize);
     }
     btnd->dataSize = dataSize;
@@ -40,7 +41,7 @@ BinTreeNodeData *binTreeNodeDataCreate(size_t dataSize, void *data) {
     return btnd;
 }
 
-BinTreeNode *binTreeNodeCreate(uintptr_t property, size_t keySize, void *key, 
+BinTreeNode *binTreeNodeCreate(uintptr_t property, size_t keySize, void *key,
                                doubleListNodeFree deNode, binTreeNodeFreeKey freeKey)
 {
     BinTreeNode *btn;
@@ -51,20 +52,23 @@ BinTreeNode *binTreeNodeCreate(uintptr_t property, size_t keySize, void *key,
 
     ckpvThenReturn(btn, NULL, NULL);
 
-    if (deNode) {
+    if (deNode)
+    {
         initDoubleList(&btn->dlist, deNode);
-    } else {
+    }
+    else
+    {
         initDoubleList(&btn->dlist, FREE);
     }
-    
 
     btn->property = property;
     btn->freeKey = freeKey;
 
-    if(key) {
+    if (key)
+    {
         memcpy(btn->key, key, keySize);
     }
-    
+
     btn->keySize = keySize;
 
     btn->parent = btn->left = btn->right = NULL;
@@ -72,7 +76,8 @@ BinTreeNode *binTreeNodeCreate(uintptr_t property, size_t keySize, void *key,
     return btn;
 }
 
-bool binTreeNodeAddData(BinTreeNode *btn, size_t dataSize, void *data) {
+bool binTreeNodeAddData(BinTreeNode *btn, size_t dataSize, void *data)
+{
     BinTreeNodeData *btnd = binTreeNodeDataCreate(dataSize, data);
 
     ckpvThenReturn(btnd, NULL, 0);
@@ -82,41 +87,49 @@ bool binTreeNodeAddData(BinTreeNode *btn, size_t dataSize, void *data) {
     return 1;
 }
 
-bool binTreeTravalPreorder(BinTree *binTree, binTreeNodeVisit binTreeNodeVisit) {
+bool binTreeTravalPreorder(BinTree *binTree, binTreeNodeVisit binTreeNodeVisit)
+{
     bool ret = 0;
     BinTreeNode *btn;
     Stack *stack;
 
-    if(!binTree || !binTree->root || !binTreeNodeVisit) {
+    if (!binTree || !binTree->root || !binTreeNodeVisit)
+    {
         goto _done;
     }
 
     stack = stackCreate(sizeof(BinTreeNode *));
-    if (!stack) {
+    if (!stack)
+    {
         goto _done;
     }
 
     btn = binTree->root;
 
-    if(!stackPush(stack, &btn)) {
+    if (!stackPush(stack, &btn))
+    {
         goto _error;
     }
-    
-    while(!stackEmpty(stack)) {
+
+    while (!stackEmpty(stack))
+    {
         stackPop(stack, &btn);
         binTreeNodeVisit(btn);
-        if(btn->right) {
-            if(!stackPush(stack, &btn->right)) {
+        if (btn->right)
+        {
+            if (!stackPush(stack, &btn->right))
+            {
                 goto _error;
             }
         }
-        if(btn->left) {
-            if(!stackPush(stack, &btn->left)) {
+        if (btn->left)
+        {
+            if (!stackPush(stack, &btn->left))
+            {
                 goto _error;
             }
         }
     }
-
 
     ret = 1;
 _error:
@@ -125,12 +138,13 @@ _done:
     return ret;
 }
 
-
-bool binTreeTravalInorder(BinTree *binTree, binTreeNodeVisit binTreeNodeVisit) {
+bool binTreeTravalInorder(BinTree *binTree, binTreeNodeVisit binTreeNodeVisit)
+{
     BinTreeNode *btn;
     bool ret = 0;
 
-    if(!binTree || !binTree->root || !binTreeNodeVisit) {
+    if (!binTree || !binTree->root || !binTreeNodeVisit)
+    {
         goto _done;
     }
 
@@ -138,25 +152,33 @@ bool binTreeTravalInorder(BinTree *binTree, binTreeNodeVisit binTreeNodeVisit) {
     btn = binTree->root;
 
 _begin:
-    while(btn->left) {
+    while (btn->left)
+    {
         btn = btn->left;
-    } 
+    }
 
 _again:
     binTreeNodeVisit(btn);
 
-    if(btn->right) {
+    if (btn->right)
+    {
         btn = btn->right;
         goto _begin;
-    } else {
+    }
+    else
+    {
     _rightChild:
-        if(!btn->parent) {
+        if (!btn->parent)
+        {
             goto _done;
         }
-        if(btn->parent->left == btn) {
+        if (btn->parent->left == btn)
+        {
             btn = btn->parent;
             goto _again;
-        } else {    /* right child  */ 
+        }
+        else
+        { /* right child  */
             btn = btn->parent;
             goto _rightChild;
         }
@@ -166,36 +188,44 @@ _done:
     return ret;
 }
 
-
-bool binTreeTravalPostorder(BinTree *binTree, binTreeNodeVisit binTreeNodeVisit) {
+bool binTreeTravalPostorder(BinTree *binTree, binTreeNodeVisit binTreeNodeVisit)
+{
     bool ret = 0;
     BinTreeNode *btn, *lastVisited = NULL;
     Stack *stack;
 
-    if(!binTree || !binTree->root || !binTreeNodeVisit) {
+    if (!binTree || !binTree->root || !binTreeNodeVisit)
+    {
         goto _done;
     }
 
     stack = stackCreate(sizeof(BinTreeNode *));
-    if (!stack) {
+    if (!stack)
+    {
         goto _done;
     }
 
     btn = binTree->root;
 
-    while(btn || !stackEmpty(stack)) {
-        while(btn) {
-            if(!stackPush(stack, &btn)) {
+    while (btn || !stackEmpty(stack))
+    {
+        while (btn)
+        {
+            if (!stackPush(stack, &btn))
+            {
                 goto _error;
             }
             btn = btn->left;
         }
-        
+
         btn = *(BinTreeNode **)stackPeek(stack);
 
-        if (btn->right && lastVisited != btn->right) {
+        if (btn->right && lastVisited != btn->right)
+        {
             btn = btn->right;
-        } else {
+        }
+        else
+        {
             stackPop(stack, &btn);
             binTreeNodeVisit(btn);
             lastVisited = btn;
@@ -210,33 +240,42 @@ _done:
     return ret;
 }
 
-bool binTreeTravalLevelorder(BinTree *binTree, binTreeNodeVisit binTreeNodeVisit) {
+bool binTreeTravalLevelorder(BinTree *binTree, binTreeNodeVisit binTreeNodeVisit)
+{
     Queue *que;
     BinTreeNode *btn;
     bool ret = 0;
 
-    if(!binTree || !binTree->root || !binTreeNodeVisit) {
+    if (!binTree || !binTree->root || !binTreeNodeVisit)
+    {
         goto _done;
     }
 
     que = queueCreate(sizeof(BinTreeNode *));
-    if (!que) {
+    if (!que)
+    {
         goto _done;
     }
 
-    if (!enQueue(que, &binTree->root)) {
+    if (!enQueue(que, &binTree->root))
+    {
         goto _error;
     }
 
-    while(!queueEmpty(que)) {
+    while (!queueEmpty(que))
+    {
         deQueue(que, &btn);
-        if(btn->left) {
-            if (!enQueue(que, &btn->left)) {
+        if (btn->left)
+        {
+            if (!enQueue(que, &btn->left))
+            {
                 goto _error;
             }
         }
-        if(btn->right) {
-            if (!enQueue(que, &btn->right)) {
+        if (btn->right)
+        {
+            if (!enQueue(que, &btn->right))
+            {
                 goto _error;
             }
         }
@@ -250,17 +289,20 @@ _done:
     return ret;
 }
 
-
-static void __freeBinTreeNode(BinTreeNode *btn) {
+static void __freeBinTreeNode(BinTreeNode *btn)
+{
     destoryDoubleList(&btn->dlist, 0);
-    if(btn->freeKey) {
+    if (btn->freeKey)
+    {
         btn->freeKey(btn->key);
     }
     FREE(btn);
 }
 
-static inline void __binTreeDestory(BinTreeNode *btn) {
-    if (!btn) {
+static inline void __binTreeDestory(BinTreeNode *btn)
+{
+    if (!btn)
+    {
         return;
     }
     __binTreeDestory(btn->left);
@@ -268,14 +310,50 @@ static inline void __binTreeDestory(BinTreeNode *btn) {
     __freeBinTreeNode(btn);
 }
 
-void binTreeDestory(BinTree *binTree, bool freeSelf) {
-    
-    if(binTree) {
+void binTreeDestory(BinTree *binTree, bool freeSelf)
+{
+
+    if (binTree)
+    {
         __binTreeDestory(binTree->root);
     }
 
-    if(freeSelf) {
+    if (freeSelf)
+    {
         FREE(binTree);
     }
+}
 
+void binTreeLeftRotate(BinTreeNode **parent, BinTreeNode *node)
+{
+    BinTreeNode *right = node->right, *rightLeft = node->right->left;
+
+    *parent = right;
+
+    right->parent = node->parent;
+    right->left = node;
+
+    node->parent = right;
+    node->right = rightLeft;
+    if (rightLeft)
+    {
+        rightLeft->parent = node;
+    }
+}
+
+void binTreeRightRotate(BinTreeNode **parent, BinTreeNode *node)
+{
+    BinTreeNode *left = node->left, *leftRight = node->left->right;
+
+    *parent = left;
+
+    left->parent = node->parent;
+    left->right = node;
+
+    node->parent = left;
+    node->left = leftRight;
+    if (leftRight)
+    {
+        leftRight->parent = node;
+    }
 }

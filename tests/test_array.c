@@ -5,33 +5,39 @@
 #include "test.h"
 #include "array.h"
 
-static int cmpInt(const void *a, const void *b) {
+static int cmpInt(const void *a, const void *b)
+{
     int intA = *(int *)a, intB = *(int *)b;
     return intA - intB;
 }
 
-static int cmpStrPtr(const void *a, const void *b) {
+static int cmpStrPtr(const void *a, const void *b)
+{
     return strcmp((const char *)(*(char **)a), (const char *)(*(char **)b));
 }
 
-static int cmpStr(const void *a, const void *b) {
+static int cmpStr(const void *a, const void *b)
+{
     return strcmp((const char *)a, (const char *)b);
 }
 
-static int _dummySearch(__attribute__((unused))const Array *arr, __attribute__((unused))const void *key) {
+static int _dummySearch(__attribute__((unused)) const Array *arr, __attribute__((unused)) const void *key)
+{
     return -1;
 }
 
-static void _visit(const void *a) {
+static void _visit(const void *a)
+{
     int intA = *(int *)a;
     printf("%d ", intA);
 }
 
 #define _INIT_CAP 4
 
-static inline void test_arrayInit() {
+static inline void test_arrayInit()
+{
     _TEST_BEGIN();
-    
+
     Array arr;
     assert(arrayInit(&arr, sizeof(int), _INIT_CAP, cmpInt));
 
@@ -41,7 +47,7 @@ static inline void test_arrayInit() {
     assert(arr.initCapacity == _INIT_CAP);
     assert(arr.elemSize == sizeof(int));
     assert(arr.search != NULL);
-    assert(arr.nextIndex==0);
+    assert(arr.nextIndex == 0);
 
     arrayDestroy(&arr, 0);
 
@@ -51,12 +57,13 @@ static inline void test_arrayInit() {
     assert(arr.initCapacity == 0);
     assert(arr.elemSize == 0);
     assert(arr.search == 0);
-    assert(arr.nextIndex==0);
+    assert(arr.nextIndex == 0);
 
     _TEST_END();
 }
 
-static inline void test_arrayCreate() {
+static inline void test_arrayCreate()
+{
     _TEST_BEGIN();
 
     int a = 1;
@@ -80,18 +87,19 @@ static inline void test_arrayCreate() {
     assert(!arraySetElem(arr, 0, &a));
     arrayTraval(arr, _visit);
     assert(arrayIsSortedAsc(arr));
-    
+
     assert(arr->search != NULL);
-    assert(arr->nextIndex==0);
+    assert(arr->nextIndex == 0);
 
     arrayDestroy(arr, 1);
 
     _TEST_END();
 }
 
-static inline void test_arraySetSearchFunc() {
+static inline void test_arraySetSearchFunc()
+{
     _TEST_BEGIN();
-    
+
     Array *arr = arrayCreate(sizeof(int), _INIT_CAP, NULL);
     assert(arr);
     assert(arr->compare == NULL);
@@ -108,12 +116,11 @@ static inline void test_arraySetSearchFunc() {
     assert(arr->search == _dummySearch);
     arrayDestroy(arr, 1);
 
-    
     _TEST_END();
 }
 
-
-static void test_arrayInsertAndDelete() {
+static void test_arrayInsertAndDelete()
+{
     _TEST_BEGIN();
 
     int a;
@@ -127,17 +134,20 @@ static void test_arrayInsertAndDelete() {
     assert(*(int *)(arrayGetElem(arr, 0)) == a);
     int j = 1;
 
-    for(int i = 1; i < 1000; i++) {
+    for (int i = 1; i < 1000; i++)
+    {
         assert(arrayInsert(arr, i, &i));
         assert(*(int *)(arrayGetElem(arr, i)) == i);
-        if( i >=  _INIT_CAP * j ) {
+        if (i >= _INIT_CAP * j)
+        {
             j <<= 1;
-            assert(arrayCapacity(arr) == _INIT_CAP * j );
+            assert(arrayCapacity(arr) == _INIT_CAP * j);
         }
         assert(arrayIsSortedAsc(arr));
     }
 
-    for(int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 1000; i++)
+    {
         assert(arrayDeleteIdx(arr, 0, &a));
         assert(arrayIsSortedAsc(arr));
         assert(a == i);
@@ -145,50 +155,54 @@ static void test_arrayInsertAndDelete() {
     assert(arrayCapacity(arr) == _INIT_CAP);
 
     j = 1;
-    for(int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 1000; i++)
+    {
         assert(arrayInsert(arr, i, &i));
         assert(*(int *)(arrayGetElem(arr, i)) == i);
-        if( i >=  _INIT_CAP * j ) {
+        if (i >= _INIT_CAP * j)
+        {
             j <<= 1;
-            assert(arrayCapacity(arr) == _INIT_CAP * j );
+            assert(arrayCapacity(arr) == _INIT_CAP * j);
         }
         assert(arrayIsSortedAsc(arr));
     }
 
-    for(int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 1000; i++)
+    {
         assert(arrayDeleteVal(arr, &i) == 0);
         assert(arrayIsSortedAsc(arr));
     }
     assert(arrayCapacity(arr) == _INIT_CAP);
-    
 
     arrayDestroy(arr, 1);
 
     _TEST_END();
 }
 
-
-static inline void test_elemSwap() {
+static inline void test_elemSwap()
+{
     _TEST_BEGIN();
 
     Array *arr = arrayCreate(sizeof(int), _INIT_CAP, cmpInt);
     assert(arr);
 
     int j = 1;
-    for(int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 1000; i++)
+    {
         assert(arrayInsert(arr, i, &i));
         assert(*(int *)(arrayGetElem(arr, i)) == i);
-        if( i >=  _INIT_CAP * j ) {
+        if (i >= _INIT_CAP * j)
+        {
             j <<= 1;
-            assert(arrayCapacity(arr) == _INIT_CAP * j );
+            assert(arrayCapacity(arr) == _INIT_CAP * j);
         }
         assert(arrayIsSortedAsc(arr));
     }
 
-    for(int i = 2000; i < 3000; i++) {
+    for (int i = 2000; i < 3000; i++)
+    {
         assert(!arrayInsert(arr, i, &i));
     }
-
 
     assert(arraySwapElemUsingDynamicMem(arr, 0, 1));
     assert(*(int *)arrayGetElem(arr, 0) == 1);
@@ -205,52 +219,61 @@ static inline void test_elemSwap() {
     _TEST_END();
 }
 
-
-static inline void test_pushPopSearchTraval() {
+static inline void test_pushPopSearchTraval()
+{
     _TEST_BEGIN();
     Array *arr = arrayCreate(sizeof(int), _INIT_CAP, cmpInt);
     assert(arr);
 
     int j = 1;
-    for(int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 1000; i++)
+    {
         assert(arrayPush(arr, &i));
         assert(*(int *)(arrayGetElem(arr, i)) == i);
-        if( i >=  _INIT_CAP * j ) {
+        if (i >= _INIT_CAP * j)
+        {
             j <<= 1;
-            assert(arrayCapacity(arr) == _INIT_CAP * j );
+            assert(arrayCapacity(arr) == _INIT_CAP * j);
         }
         assert(arrayIsSortedAsc(arr));
-        if( i < 20 ) {
-                arrayTraval(arr, _visit);
-                printf("\n");
-            }
+        if (i < 20)
+        {
+            arrayTraval(arr, _visit);
+            printf("\n");
+        }
     }
-    for(int i = 0; i < 2000; i++) {
-        if(i < 1000) {
+    for (int i = 0; i < 2000; i++)
+    {
+        if (i < 1000)
+        {
             assert(arraySearch(arr, &i) == i);
             assert(arrayContains(arr, &i));
-            
-        } else {
+        }
+        else
+        {
             assert(arraySearch(arr, &i) == -1);
             assert(!arrayContains(arr, &i));
         }
     }
     int a;
-    for(int i = 0; i < 2000; i++) {
-        if(i < 1000) {
+    for (int i = 0; i < 2000; i++)
+    {
+        if (i < 1000)
+        {
             assert(arrayPop(arr, &a));
-            assert(a == 999-i);
-        } else {
+            assert(a == 999 - i);
+        }
+        else
+        {
             assert(!arrayPop(arr, &a));
         }
     }
 
-
     _TEST_END();
 }
 
-
-static inline void test_elemStrSwap() {
+static inline void test_elemStrSwap()
+{
     _TEST_BEGIN();
 
     char *a = "hello", *b = "bitch";
@@ -301,14 +324,13 @@ static inline void test_elemStrSwap() {
     assert(strcmp((const char *)arrayGetElem(arrStrPtr, 0), b) == 0);
     printf("%s, %s\n", (char *)arrayGetElem(arrStrPtr, 0), (char *)arrayGetElem(arrStrPtr, 1));
 
-
     arrayDestroy(arrStrPtr, 1);
 
     _TEST_END();
 }
 
-
-int main(void) {
+int main(void)
+{
     test_arrayInit();
     test_arrayCreate();
     test_arraySetSearchFunc();
@@ -318,4 +340,3 @@ int main(void) {
     test_elemStrSwap();
     return 0;
 }
-

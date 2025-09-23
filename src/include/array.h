@@ -4,7 +4,6 @@
 #include <string.h>
 #include "utils.h"
 
-
 typedef struct ArrayStruct Array;
 
 /**
@@ -29,17 +28,16 @@ typedef int (*arrayElemSearch)(const Array *arr, const void *key);
  */
 typedef void (*arrayElemVisit)(const void *a);
 
-struct ArrayStruct {
-    void            *data;              /* data area for element */
-    size_t          elemSize;           /* size of element */
-    int             nextIndex;          /* index for next element */
-    int             initCapacity;       /* initialized array capacity   */
-    int             currentCapacity;    /* current array capacity */
-    arrayElemCmp    compare;            /* compare function, if [NULL], element is not comparable */
-    arrayElemSearch search;             /* search function for element only valid when element is comparable */
+struct ArrayStruct
+{
+    void *data;             /* data area for element */
+    size_t elemSize;        /* size of element */
+    int nextIndex;          /* index for next element */
+    int initCapacity;       /* initialized array capacity   */
+    int currentCapacity;    /* current array capacity */
+    arrayElemCmp compare;   /* compare function, if [NULL], element is not comparable */
+    arrayElemSearch search; /* search function for element only valid when element is comparable */
 };
-
-
 
 /**
  * @brief initialize a [Array], memory of [Array] managed by caller
@@ -51,16 +49,14 @@ struct ArrayStruct {
  */
 bool arrayInit(Array *arr, int eSize, int capacity, arrayElemCmp cmp);
 
-
 /**
  * @brief create a [Array]
  * @param eSize: size of single element
- * @param capacity: initialized capacity 
+ * @param capacity: initialized capacity
  * @param cmp: compare function, if [NULL], element is not comparable
  * @return pointor to a [Array] on successful. [NULL] on failure
  */
 Array *arrayCreate(int eSize, int capacity, arrayElemCmp cmp);
-
 
 /**
  * @brief destroy a [Array]
@@ -69,21 +65,21 @@ Array *arrayCreate(int eSize, int capacity, arrayElemCmp cmp);
  */
 void arrayDestroy(Array *arr, bool freeSelf);
 
-
 /**
  * @brief reset search function for a [Array]
  * @param arr: pointor of [Array]
  * @param func: search function for elemnt
  */
-#define arraySetSearchFunc(arr, func)                                   \
-    do {                                                                \
-        Array *_a_arraySetSearchFunc = (Array *)(arr);                  \
-        arrayElemSearch _f_arraySetSearchFunc = (func);                 \
-        if (_f_arraySetSearchFunc && _a_arraySetSearchFunc->compare) {  \
-            _a_arraySetSearchFunc->search = _f_arraySetSearchFunc;      \
-        }                                                               \
-    } while(0)
-
+#define arraySetSearchFunc(arr, func)                                \
+    do                                                               \
+    {                                                                \
+        Array *_a_arraySetSearchFunc = (Array *)(arr);               \
+        arrayElemSearch _f_arraySetSearchFunc = (func);              \
+        if (_f_arraySetSearchFunc && _a_arraySetSearchFunc->compare) \
+        {                                                            \
+            _a_arraySetSearchFunc->search = _f_arraySetSearchFunc;   \
+        }                                                            \
+    } while (0)
 
 /**
  * @brief get current capctity of this [Array]
@@ -92,7 +88,6 @@ void arrayDestroy(Array *arr, bool freeSelf);
  */
 #define arrayCapacity(arr) ((arr)->currentCapacity)
 
-
 /**
  * @brief get array's element size
  * @param arr: pointor of [Array]
@@ -100,14 +95,12 @@ void arrayDestroy(Array *arr, bool freeSelf);
  */
 #define arrayElemSize(arr) ((arr)->elemSize)
 
-
 /**
  * @brief get current count of element
- * @param arr: pointor of [Array] 
+ * @param arr: pointor of [Array]
  * @return count of element
  */
 #define arrayElemCnt(arr) ((arr)->nextIndex)
-
 
 /**
  * @brief get the index for a new element
@@ -116,19 +109,17 @@ void arrayDestroy(Array *arr, bool freeSelf);
  */
 #define arrayNextIdx(arr) arrayElemCnt(arr)
 
-
 /**
  * @brief check a index is overflow current element count
  * @param arr: pointor of [Array]
  * @param idx: index need be checked
  * @return 1 when overflow; otherwise 0
  */
-#define arrayOverFlow(arr, idx) ({                                                         \
-    Array *_a_arrayOverFlow = (arr);                                                       \
-    int _idx_arrayOverFlow = (idx);                                                        \
-    (_idx_arrayOverFlow) < 0 || (_idx_arrayOverFlow) >= arrayElemCnt(_a_arrayOverFlow);    \
+#define arrayOverFlow(arr, idx) ({                                                      \
+    Array *_a_arrayOverFlow = (arr);                                                    \
+    int _idx_arrayOverFlow = (idx);                                                     \
+    (_idx_arrayOverFlow) < 0 || (_idx_arrayOverFlow) >= arrayElemCnt(_a_arrayOverFlow); \
 })
-
 
 /**
  * @brief check a array is empty or not
@@ -137,17 +128,15 @@ void arrayDestroy(Array *arr, bool freeSelf);
  */
 #define arrayEmpty(arr) (arrayElemCnt(arr) == 0)
 
-
 /**
  * @brief check a array is full or not
  * @param arr: pointor of [Array]
  * @return 1 on full; otherwise 0
  */
-#define arrayIsFull(arr) ({                                               \
-        Array *_a_arrayIsFull = (arr);                                    \
-        arrayElemCnt(_a_arrayIsFull) == arrayCapacity(_a_arrayIsFull);    \
-    })
-
+#define arrayIsFull(arr) ({                                        \
+    Array *_a_arrayIsFull = (arr);                                 \
+    arrayElemCnt(_a_arrayIsFull) == arrayCapacity(_a_arrayIsFull); \
+})
 
 /**
  * @brief increment array index
@@ -155,13 +144,11 @@ void arrayDestroy(Array *arr, bool freeSelf);
  */
 #define arrayIncIdx(arr) ((arr)->nextIndex++)
 
-
 /**
  * @brief decrement array index
  * @param arr: pointor of [Array]
  */
 #define arrayDecIdx(arr) ((arr)->nextIndex--)
-
 
 /**
  * @brief get the address of index(not check the index valid or not)
@@ -169,12 +156,11 @@ void arrayDestroy(Array *arr, bool freeSelf);
  * @param idx: index in [Array]
  * @return address of index
  */
-#define arrayGetAddr(arr, idx) ({                                                   \
-    Array *_a_arrayGetAddr = (Array *)(arr);                                        \
-    int _idx_arrayGetAddr = (idx);                                                  \
-    ((_a_arrayGetAddr)->data + (_idx_arrayGetAddr) * (_a_arrayGetAddr)->elemSize);  \
+#define arrayGetAddr(arr, idx) ({                                                  \
+    Array *_a_arrayGetAddr = (Array *)(arr);                                       \
+    int _idx_arrayGetAddr = (idx);                                                 \
+    ((_a_arrayGetAddr)->data + (_idx_arrayGetAddr) * (_a_arrayGetAddr)->elemSize); \
 })
-
 
 /**
  * @brief get pointor to the element by index
@@ -182,12 +168,11 @@ void arrayDestroy(Array *arr, bool freeSelf);
  * @param idx: index in [Array]
  * @return pointor to the elment when index not overflow, [NULL] otherwise
  */
-#define arrayGetElem(arr, idx) ({                                                                                      \
-        Array *_a_arrayGetElem = (arr);                                                                                \
-        int _idx_arrayGetElem = (idx);                                                                                 \
-        arrayOverFlow(_a_arrayGetElem, _idx_arrayGetElem) ? NULL : arrayGetAddr(_a_arrayGetElem, _idx_arrayGetElem);   \
-    })
-
+#define arrayGetElem(arr, idx) ({                                                                                \
+    Array *_a_arrayGetElem = (arr);                                                                              \
+    int _idx_arrayGetElem = (idx);                                                                               \
+    arrayOverFlow(_a_arrayGetElem, _idx_arrayGetElem) ? NULL : arrayGetAddr(_a_arrayGetElem, _idx_arrayGetElem); \
+})
 
 /**
  * @brief set element on [idx], idx must be valid
@@ -208,23 +193,24 @@ void arrayDestroy(Array *arr, bool freeSelf);
     }                                                                                \
     _res_arraySetElem; })
 
-
 /**
  * @brief traval [Array]，if handler is not null, call handler in element
  * @param arr: pointor of [Array]
  * @param handler: visit function
-*/
-#define arrayTraval(arr, handler)                                                                             \
-    do {                                                                                                      \
-        arrayElemVisit _f_arrayTraval = (handler);                                                            \
-        Array *_a_arrayTraval = (arr);                                                                        \
-        if(_f_arrayTraval != NULL) {                                                                          \
-            for(int _i_arrayTraval = 0; _i_arrayTraval < arrayElemCnt(_a_arrayTraval); ++_i_arrayTraval) {    \
-               (_f_arrayTraval)(arrayGetAddr(_a_arrayTraval, _i_arrayTraval));                                \
-            }                                                                                                 \
-        }                                                                                                     \
-    } while(0)
-
+ */
+#define arrayTraval(arr, handler)                                                                         \
+    do                                                                                                    \
+    {                                                                                                     \
+        arrayElemVisit _f_arrayTraval = (handler);                                                        \
+        Array *_a_arrayTraval = (arr);                                                                    \
+        if (_f_arrayTraval != NULL)                                                                       \
+        {                                                                                                 \
+            for (int _i_arrayTraval = 0; _i_arrayTraval < arrayElemCnt(_a_arrayTraval); ++_i_arrayTraval) \
+            {                                                                                             \
+                (_f_arrayTraval)(arrayGetAddr(_a_arrayTraval, _i_arrayTraval));                           \
+            }                                                                                             \
+        }                                                                                                 \
+    } while (0)
 
 /**
  * @brief check [Array] is ordered or not
@@ -272,11 +258,10 @@ void arrayDestroy(Array *arr, bool freeSelf);
     }                                                                                                          \
     _res_arrayIsSortedAsc; })
 
-
 /**
  * @brief swap two element in a [Array]
  * INFO: because using [MALLOC], maybe failed
- * @param arr: pointor of [Array] 
+ * @param arr: pointor of [Array]
  * @param i index of element
  * @param j index of elemnt
  * @return 1 on successful; 0 on failure
@@ -298,17 +283,17 @@ void arrayDestroy(Array *arr, bool freeSelf);
     }                                                                                                                           \
     _res_arraySwapElemUDM; })
 
-
 #define _ARR_FIX_BUFFER_SIZE 4096
 /* thread safe */
-static inline char *_arrayGetBuffer(void) {
+static inline char *_arrayGetBuffer(void)
+{
     _Thread_local static char _arrayBuffer[_ARR_FIX_BUFFER_SIZE];
     return _arrayBuffer;
 }
 /**
  * @brief swap two element in a [Array]
  * INFO: size of elemnt maybe larger than [_ARR_FIX_BUFFER_SIZE]
- * @param arr: pointor of [Array] 
+ * @param arr: pointor of [Array]
  * @param i index of element
  * @param j index of elemnt
  * @return 1 on successful; 0 on failure
@@ -337,26 +322,26 @@ static inline char *_arrayGetBuffer(void) {
 /**
  * @brief swap two element in a [Array]
  * INFO: [i] or [j] maybe overflow
- * @param arr: pointor of [Array] 
+ * @param arr: pointor of [Array]
  * @param i index of element
  * @param j index of elemnt
  * @return 1 on successful; 0 on failure
  */
-#define arraySwapElem(arr, i, j) ({                                                                                     \
-    Array *__ase_array = (arr);                                                                                         \
-    int __ase_i = (i), __ase_j = (j);                                                                                   \
-    bool __ase_res = 0;                                                                                                 \
-    if( !arrayOverFlow(__ase_array, __ase_i) && !arrayOverFlow(__ase_array, __ase_j) ) {                                \
-        swapMem(arrayGetAddr(__ase_array, __ase_i), arrayGetAddr(__ase_array, __ase_j), arrayElemSize(__ase_array));    \
-        __ase_res = 1;                                                                                                  \
-    }                                                                                                                   \
-    __ase_res;                                                                                                          \
+#define arraySwapElem(arr, i, j) ({                                                                                  \
+    Array *__ase_array = (arr);                                                                                      \
+    int __ase_i = (i), __ase_j = (j);                                                                                \
+    bool __ase_res = 0;                                                                                              \
+    if (!arrayOverFlow(__ase_array, __ase_i) && !arrayOverFlow(__ase_array, __ase_j))                                \
+    {                                                                                                                \
+        swapMem(arrayGetAddr(__ase_array, __ase_i), arrayGetAddr(__ase_array, __ase_j), arrayElemSize(__ase_array)); \
+        __ase_res = 1;                                                                                               \
+    }                                                                                                                \
+    __ase_res;                                                                                                       \
 })
-
 
 /**
  * @brief resize a [Array] capacity
- * @param arr: pointor of [Array] 
+ * @param arr: pointor of [Array]
  * @param newSize: new capacity
  * @return 1 on successful, 0 on failure
  */
@@ -377,10 +362,9 @@ static inline char *_arrayGetBuffer(void) {
     }                                                                                                                   \
     _res_arrayResize; })
 
-
 /**
- * @brief insert a elemnt at [idx] 
- * @param arr: pointor of [Array] 
+ * @brief insert a elemnt at [idx]
+ * @param arr: pointor of [Array]
  * @param idx: index where to be inserted
  * @param val: pointor to the value of new element
  * @return 1 on successful, 0 on failure
@@ -405,10 +389,9 @@ static inline char *_arrayGetBuffer(void) {
     }                                                                                                                   \
     _res_arrayInsert; })
 
-
 /**
  * @brief search a val in a [Array] (the first one)
- * @param arr: pointor of [Array]  
+ * @param arr: pointor of [Array]
  * @param val: pointor to the value of element
  * @return index on successful; -1 on no this [val]
  */
@@ -417,21 +400,19 @@ static inline char *_arrayGetBuffer(void) {
         void *_v_arraySearch = (void *)(val);                       \
         _a_arraySearch->search(_a_arraySearch, _v_arraySearch); })
 
-
 /**
  * @brief check a [val] whether in a [Array]
- * @param arr: pointor of [Array]  
+ * @param arr: pointor of [Array]
  * @param val: pointor to the value of element
  * @return 1 when [val] in [Array]; 0 otherwise
  */
 #define arrayContains(arr, val) (arraySearch(arr, val) != -1)
 
-
 /**
  * @brief delete a element at [idx]
- * @param arr: pointor of [Array]  
+ * @param arr: pointor of [Array]
  * @param idx: element of index needed be deleted
- * @param retval: address which recieve the element to be deleted. the call ensure that there is enoungh space. 
+ * @param retval: address which recieve the element to be deleted. the call ensure that there is enoungh space.
  * @return 1 on successful, 0 on failure
  */
 #define arrayDeleteIdx(arr, idx, retval) ({                                                                             \
@@ -457,11 +438,10 @@ static inline char *_arrayGetBuffer(void) {
     }                                                                                                                   \
     _res_arrayDeleteIdx; })
 
-
 /**
  * @brief delete a val in a element
- * @param arr: pointor of [Array]  
- * @param val: pointor to the value of element 
+ * @param arr: pointor of [Array]
+ * @param val: pointor to the value of element
  * @return the former index(the first one) of this [val] in the [Array]
  */
 #define arrayDeleteVal(arr, val) ({                                                 \
@@ -471,10 +451,9 @@ static inline char *_arrayGetBuffer(void) {
     arrayDeleteIdx(_a_arrayDeleteVal, _res_arrayDeleteVal, NULL);                   \
     _res_arrayDeleteVal; })
 
-
 /**
  * @brief add a element in the tail of [Array]
- * @param arr: pointor of [Array]  
+ * @param arr: pointor of [Array]
  * @param val: pointor to the value of new element
  * @return 1 on successful, 0 on failure
  */
@@ -484,17 +463,15 @@ static inline char *_arrayGetBuffer(void) {
         int _nextIdx_arrayPush = arrayNextIdx(_a_arrayPush);               \
         arrayInsert(_a_arrayPush, _nextIdx_arrayPush, _v_arrayPush); })
 
-
 /**
  * @brief pop a element in the tail of [Array]
- * @param arr: pointor of [Array]  
- * @param retval: address which recieve the element to be deleted. the call ensure that there is enoungh space.  
+ * @param arr: pointor of [Array]
+ * @param retval: address which recieve the element to be deleted. the call ensure that there is enoungh space.
  * @return 1 on successful, 0 on failure
  */
 #define arrayPop(arr, retval) ({                                                         \
         Array *_a_arrayPop = (arr);                                                      \
         void *_v_arrayPop = (void *)(retval);                                            \
-        arrayDeleteIdx(_a_arrayPop, arrayNextIdx(_a_arrayPop) - 1, _v_arrayPop);})
-
+        arrayDeleteIdx(_a_arrayPop, arrayNextIdx(_a_arrayPop) - 1, _v_arrayPop); })
 
 #endif //_ARRAY_H_

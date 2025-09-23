@@ -1,25 +1,26 @@
 #include "hash.h"
 #include "utils.h"
 
-
-
-Hash *hashCreate(hashFunc hashFunc, hashCmpKey cmp, int slotCnt, doubleListNodeFree dlnFunc) {
+Hash *hashCreate(hashFunc hashFunc, hashCmpKey cmp, int slotCnt, doubleListNodeFree dlnFunc)
+{
     Hash *h = MALLOC(sizeof(Hash));
 
     ckpvThenReturn(h, NULL, NULL);
 
     h->slot = MALLOC(sizeof(DoubleList) * slotCnt);
 
-    if(!h->slot) {
+    if (!h->slot)
+    {
         FREE(h);
         h = NULL;
         goto _done;
     }
 
-    for(int i = 0; i < slotCnt; i++) {
+    for (int i = 0; i < slotCnt; i++)
+    {
         initDoubleList(&h->slot[i], dlnFunc);
     }
-    
+
     h->hash = hashFunc;
     h->cmp = cmp;
     h->slotCnt = slotCnt;
@@ -28,8 +29,8 @@ _done:
     return h;
 }
 
-
-HashNode *hashNodeCreate(uintptr_t key, size_t dataSize, void *data) {
+HashNode *hashNodeCreate(uintptr_t key, size_t dataSize, void *data)
+{
     HashNode *hn;
     dataSize = dataSize <= 1 ? 1 : dataSize;
     hn = MALLOC(sizeof(HashNode) + dataSize - 1);
@@ -38,9 +39,10 @@ HashNode *hashNodeCreate(uintptr_t key, size_t dataSize, void *data) {
 
     initDoubleListNode(&hn->dln);
 
-    if(data) {
+    if (data)
+    {
         memcpy(hn->data, data, dataSize);
-    } 
+    }
 
     hn->dataSize = dataSize;
     hn->key = key;
@@ -48,23 +50,25 @@ HashNode *hashNodeCreate(uintptr_t key, size_t dataSize, void *data) {
     return hn;
 }
 
-
-HashNode *hashSearch(Hash *h, uintptr_t key) {
+HashNode *hashSearch(Hash *h, uintptr_t key)
+{
     HashNode *hn = NULL, *hnTmp;
     DoubleList *dl;
     DoubleListNode *dln;
     int slotIdx;
 
     ckpvThenReturn(h, NULL, NULL);
-    
+
     slotIdx = h->hash(key) % h->slotCnt;
 
     dl = &h->slot[slotIdx];
     dln = dl->header.next;
 
-    while(!isDoubleListSentinel(dln)) {
+    while (!isDoubleListSentinel(dln))
+    {
         hnTmp = containerOf(dln, HashNode, dln);
-        if(h->cmp(hnTmp->key, key) == 0) {
+        if (h->cmp(hnTmp->key, key) == 0)
+        {
             hn = hnTmp;
             goto _done;
         }
@@ -75,8 +79,8 @@ _done:
     return hn;
 }
 
-
-int hashAdd(Hash *h, uintptr_t key, size_t dataSize, void *data) {
+int hashAdd(Hash *h, uintptr_t key, size_t dataSize, void *data)
+{
     int ret = -1;
     HashNode *hn;
     DoubleList *dl;
@@ -84,7 +88,8 @@ int hashAdd(Hash *h, uintptr_t key, size_t dataSize, void *data) {
 
     ckpvThenReturn(h, NULL, ret);
 
-    if(hashSearch(h, key)) {    /* duplicated key */
+    if (hashSearch(h, key))
+    { /* duplicated key */
         ret = 1;
         goto _done;
     }
@@ -95,7 +100,7 @@ int hashAdd(Hash *h, uintptr_t key, size_t dataSize, void *data) {
 
     slotIdx = h->hash(key) % h->slotCnt;
     dl = &h->slot[slotIdx];
-    
+
     addNodeAtDoubleListTail(dl, &hn->dln);
     ret = 0;
 
@@ -103,8 +108,8 @@ _done:
     return ret;
 }
 
-
-HashNode *hashDelete(Hash *h, uintptr_t key) {
+HashNode *hashDelete(Hash *h, uintptr_t key)
+{
     HashNode *hn = hashSearch(h, key);
 
     ckpvThenReturn(hn, NULL, NULL);
@@ -114,31 +119,34 @@ HashNode *hashDelete(Hash *h, uintptr_t key) {
     return hn;
 }
 
-void hashDestory(Hash *h) {
-    for(int i = 0; i < h->slotCnt; i++) {
+void hashDestory(Hash *h)
+{
+    for (int i = 0; i < h->slotCnt; i++)
+    {
         destoryDoubleList(&h->slot[i], 0);
     }
     FREE(h);
 }
 
-
-uintptr_t defaultHashStr(uintptr_t str) {
+uintptr_t defaultHashStr(uintptr_t str)
+{
     char *c = (char *)str;
     uintptr_t salt = 0;
-    while(*c != 0) {
+    while (*c != 0)
+    {
         salt = __hash(salt, *c);
         c++;
     }
     return salt;
 }
 
-
-uintptr_t defaultHashNum(uintptr_t num) {
+uintptr_t defaultHashNum(uintptr_t num)
+{
     uintptr_t n = (uintptr_t)num;
     uintptr_t salt = 0;
-    for(int i = 0; i < 7; i++) {
+    for (int i = 0; i < 7; i++)
+    {
         salt = __hash(salt, n);
     }
     return salt;
 }
-

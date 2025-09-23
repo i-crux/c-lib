@@ -7,24 +7,22 @@ typedef Array Stack;
 
 /**
  * @brief initialize a [Stack], memory for [stack] is managed by caller
- * 
+ *
  * @param stack: pointor to [Stack]
  * @param eSize: size of single element
- * 
+ *
  * @return 1 on successfull. 0 on failure
  */
 bool stackInit(Stack *stack, int eSize);
 
-
 /**
  * @brief create a [Stack]
- * 
+ *
  * @param eSize: size of single element
- * 
+ *
  * @return pointor to a [Stack] on successful. [NULL] on failure
  */
 Stack *stackCreate(int eSize);
-
 
 #define stackEmpty arrayEmpty
 
@@ -34,9 +32,9 @@ Stack *stackCreate(int eSize);
 
 /**
  * @brief get the pointor of data at top of [Stack]
- * 
+ *
  * @param stack: pointor of [Stack]
- * 
+ *
  * @return pointor of data at the top of [Stack], NULL on empty stack
  */
 void *stackPeek(Stack *stack);

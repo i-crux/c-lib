@@ -2,11 +2,13 @@
 #include "binTree.h"
 #include "utils.h"
 
-static void __freeDummy(void *p) {
+static void __freeDummy(void *p)
+{
     printf("%p\n", p);
 }
 
-static inline void test_binTreeInit() {
+static inline void test_binTreeInit()
+{
     _TEST_BEGIN();
 
     BinTree bt, *btp;
@@ -31,11 +33,12 @@ static inline void test_binTreeInit() {
 
 #define __STR_DATA "hello, bitch"
 
-static inline void test_binTreeNodeDataCreate() {
+static inline void test_binTreeNodeDataCreate()
+{
     _TEST_BEGIN();
 
-    int             intData = 1024;
-    char            *strData = __STR_DATA;
+    int intData = 1024;
+    char *strData = __STR_DATA;
     BinTreeNodeData *btndp;
 
     btndp = binTreeNodeDataCreate(sizeof(int), &intData);
@@ -47,7 +50,8 @@ static inline void test_binTreeNodeDataCreate() {
     btndp = binTreeNodeDataCreate(sizeof(__STR_DATA), strData);
     assert(btndp);
     printf("%s   %s\n", (char *)btndp->data, strData);
-    for(size_t i = 0; i < sizeof(__STR_DATA); i++) {
+    for (size_t i = 0; i < sizeof(__STR_DATA); i++)
+    {
         assert(((char *)(btndp->data))[i] == strData[i]);
     }
     FREE(btndp);
@@ -55,16 +59,16 @@ static inline void test_binTreeNodeDataCreate() {
     _TEST_END();
 }
 
-
-static inline void test_binTreeNodeCreate() {
+static inline void test_binTreeNodeCreate()
+{
     _TEST_BEGIN();
 
-    int     intKey = 1024;
-    char    *strKey = malloc(sizeof(__STR_DATA));
+    int intKey = 1024;
+    char *strKey = malloc(sizeof(__STR_DATA));
     assert(strKey);
     memcpy(strKey, __STR_DATA, sizeof(__STR_DATA));
-    
-    BinTreeNode  *btnp = binTreeNodeCreate(0, sizeof(int), &intKey, NULL, NULL);
+
+    BinTreeNode *btnp = binTreeNodeCreate(0, sizeof(int), &intKey, NULL, NULL);
     assert(btnp);
     assert(btnp->freeKey == NULL);
     assert(*(int *)(btnp->key) == intKey);
@@ -89,18 +93,16 @@ static inline void test_binTreeNodeCreate() {
     btnp->freeKey(*(char **)(btnp->key));
     assert(btnp->keySize == sizeof(char *));
     FREE(btnp);
-    
 
     _TEST_END();
 }
 
-
-int main(void) {
+int main(void)
+{
 
     test_binTreeInit();
     test_binTreeNodeDataCreate();
     test_binTreeNodeCreate();
-
 
     return 0;
 }
