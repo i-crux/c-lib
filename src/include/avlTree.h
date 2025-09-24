@@ -8,14 +8,17 @@
  * ! when initialize a [AVLTree], [binTreeElemCmp] must be provided
  */
 
-typedef enum
-{
-    leftHeight = -1,
-    sameHeight = 0,
-    rightHeight = 1,
-} AVLBalanceFactor;
+// typedef enum
+// {
+//     leftHeight = -1,
+//     sameHeight = 0,
+//     rightHeight = 1,
+// } AVLBalanceFactor;
 
 #define AVLTree BinTree
+/*
+ * [property] is means: height of tree
+ */
 #define AVLTreeNode BinTreeNode
 #define AVLTreeNodeData BinTreeNodeData
 
@@ -23,7 +26,7 @@ typedef enum
 #define avlTreeCreate binTreeCreate
 #define avlTreeNodeDataCreate binTreeNodeDataCreate
 #define avlTreeNodeCreate(keySize, key, deNode, freeKey) \
-    binTreeNodeCreate((uintptr_t)sameHeight, keySize, key, deNode, freeKey)
+    binTreeNodeCreate(0, keySize, key, deNode, freeKey)
 #define avlTreeNodeAddData binTreeNodeAddData
 #define avlTreeSearch bstSearch
 

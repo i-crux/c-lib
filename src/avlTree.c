@@ -1,210 +1,188 @@
-#include "stdlib.h"
 #include "avlTree.h"
+#include "utils.h"
 
 /**
- * @brief left property in [avlNode]
+ * @brief update a [AVLTreeNode] height
  *
- * @param avltree: pointor to [AVLTree]
- * @param avlNode: pointor to [AVLTreeNode]
+ * @param avltn: pointor to [AVLTreeNode]
  */
-static inline void
-_leftBalance(AVLTree *avltree, AVLTreeNode *avlNode)
+static inline void _avlTreeUpdateHeight(AVLTreeNode *avltn)
 {
-    AVLTreeNode *nl = avlNode->left;
-    AVLTreeNode *nlr;
-    AVLTreeNode **inserted;
-    if (avlNode->parent)
-    {
-        inserted = avlNode->parent->left == avlNode ? &avlNode->parent->left : &avlNode->parent->right;
-    }
-    else
-    {
-        inserted = &avltree->root;
-    }
-    switch (nl->property)
-    {
-    case leftHeight:
-        nl->property = sameHeight;             /*          n             nl                         */
-        avlNode->property = sameHeight;        /*         /             /  \                        */
-        binTreeRightRotate(inserted, avlNode); /*        nl      ==>   lh   n                       */
-                                               /*       /                                           */
-        break;                                 /*      lh                                           */
-    case rightHeight:                          /*                                                   */
-        nlr = nl->right;                       /*          n              n              nlr        */
-        switch (nlr->property)                 /*         / \            / \            /   \       */
-        {                                      /*        nl  0          nlr 0          nl    n      */
-        case leftHeight:                       /*       /  \     ==>    /        ==>  /  \    \     */
-            nl->property = sameHeight;         /*      0   nlr         nl            0   lh    0    */
-            avlNode->property = rightHeight;   /*          /          /  \                          */
-            break;                             /*         lh         0   lh                         */
-        case sameHeight:                       /*                                                   */
-            nl->property = sameHeight;         /*          n               n              nlr       */
-            avlNode->property = sameHeight;    /*         /               /              /   \      */
-            break;                             /*        nl       ==>    nlr     ==>    nl    n     */
-        case rightHeight:                      /*          \            /                           */
-            nl->property = leftHeight;         /*          nlr         nl                           */
-            avlNode->property = sameHeight;    /*                                                   */
-            break;                             /*          n                n              nlr      */
-        } /*                                              / \              / \            /   \     */
-        nlr->property = sameHeight;            /*        nl  0            nlr 0          nl    n    */
-        binTreeLeftRotate(&avlNode->left, nl); /*       /  \       ==>   /  \     ==>   /     / \   */
-                                               /*      0   nlr          nl  rh         0     rh  0  */
-        binTreeRightRotate(inserted, avlNode); /*             \        /                            */
-                                               /*             rh      0                             */
-        break;                                 /*                                                   */
-    case sameHeight:                           /*          n                nl                      */
-        nl->property = rightHeight;            /*         /                /  \                     */
-        binTreeRightRotate(inserted, avlNode); /*        nl         ==>   0    n                    */
-                                               /*       /  \                  /                     */
-        break;                                 /*      0    0                0                      */
-    }
-}
 
-static inline void
-_rightBalance(AVLTree *avltree, AVLTreeNode *avlNode)
-{
-    AVLTreeNode *nr = avlNode->right;
-    AVLTreeNode *nrl;
-    AVLTreeNode **inserted;
-    if (avlNode->parent)
+    AVLTreeNode *left, *right;
+    intptr_t hl, hr;
+    if (!avltn)
     {
-        inserted = avlNode->parent->left == avlNode ? &avlNode->parent->left : &avlNode->parent->right;
-    }
-    else
-    {
-        inserted = &avltree->root;
+        return;
     }
 
-    switch (nr->property)
-    {
-    case rightHeight:
-        nr->property = sameHeight;
-        avlNode->property = sameHeight;
-        binTreeLeftRotate(inserted, avlNode);
-        break;
-    case leftHeight:
-        nrl = nr->left;
-        switch (nrl->property)
-        {
-        case rightHeight:
-            nr->property = sameHeight;
-            avlNode->property = leftHeight;
-            break;
-        case sameHeight:
-            nr->property = sameHeight;
-            avlNode->property = sameHeight;
-            break;
-        case leftHeight:
-            nr->property = rightHeight;
-            avlNode->property = sameHeight;
-            break;
-        }
-        nrl->property = sameHeight;
-        binTreeRightRotate(&avlNode->right, nr);
-        binTreeLeftRotate(inserted, avlNode);
-    case sameHeight:
-        nr->property = leftHeight;
-        binTreeLeftRotate(inserted, avlNode);
-        break;
-    }
+    left = avltn->left;
+    right = avltn->right;
+
+    hl = left ? left->property : 0;
+    hr = right ? right->property : 0;
+
+    avltn->property = max(hl, hr) + 1;
 }
 
 /**
- * @brief insert a node to [AVLTree]
+ * @brief get balance factor of a [AVLTree]
  *
- * @param proot: parent of [avlNode]
- * @param root: insert point
- * @param avlNode: the node will be inserted
- * @param taller: the [AVLTree] get taller of not
- * @param avltree: pointor to the [AVLTree]
- *
- * @return 0 on successful, 1 on duplicated key, -1 error
+ * @param avltn: pointor to a [AVLTreeNode]
+ * @return subof(height-of-rigth-subtree, height-of-left-subtree)
  */
-static inline int _doAvlTreeInsert(AVLTreeNode *proot, AVLTreeNode **root, AVLTreeNode *avlNode, bool *taller, AVLTree *avltree)
+static inline intptr_t _avlTreeGetBalanceFactor(AVLTreeNode *avltn)
 {
-    int cmpresult; /* compare result for the [key] */
-    DoubleListNode *dln;
+    AVLTreeNode *left, *right;
+    intptr_t hl, hr;
 
-    if (*root == NULL) /* the tree maybe empty or find the insert point */
+    left = avltn->left;
+    right = avltn->right;
+
+    hl = left ? left->property : 0;
+    hr = right ? right->property : 0;
+
+    return hr - hl;
+}
+
+/*          n             nl                         */
+/*         /             /  \                        */
+/*        nl      ==>   lh   n                       */
+/*       /                                           */
+/*      lh                                           */
+/*                                                   */
+/*          n              n              nlr        */
+/*         / \            / \            /   \       */
+/*        nl  0          nlr 0          nl    n      */
+/*       /  \     ==>    /        ==>  /  \    \     */
+/*      0   nlr         nl            0   lh    0    */
+/*          /          /  \                          */
+/*         lh         0   lh                         */
+/*                                                   */
+/*          n               n              nlr       */
+/*         /               /              /   \      */
+/*        nl       ==>    nlr     ==>    nl    n     */
+/*          \            /                           */
+/*          nlr         nl                           */
+/*                                                   */
+/*          n                n              nlr      */
+/*         / \              / \            /   \     */
+/*        nl  0            nlr 0          nl    n    */
+/*       /  \       ==>   /  \     ==>   /     / \   */
+/*      0   nlr          nl  rh         0     rh  0  */
+/*             \        /                            */
+/*             rh      0                             */
+/*                                                   */
+/*          n                nl                      */
+/*         /                /  \                     */
+/*        nl         ==>   0    n                    */
+/*       /  \                  /                     */
+/*      0    0                0                      */
+
+/**
+ * @brief rebalance a [AVLTree]
+ *
+ * @param avlt: pointor to a [AVLTree]
+ * @param avltn: pointor to a [AVLTreeNode]
+ * @param height: 0: keep same height; 1: get higher; -1: get shorter
+ */
+static inline void _avlTreeRebalance(AVLTree *avlt, AVLTreeNode *avltn)
+{
+    AVLTreeNode *parent = avltn, **inserted;
+    intptr_t bf;
+
+    while (parent)
     {
-        *taller = 1; /* insert successful. the tree get taller */
-        if (proot != NULL)
-            avlNode->parent = proot;
+        _avlTreeUpdateHeight(parent);
+
+        if (parent->parent)
+        {
+            inserted = parent->parent->left == parent ? &parent->parent->left : &parent->parent->right;
+        }
         else
-            avlNode->parent = NULL;
-        *root = avlNode; /* insert the node to the tree */
-        return 0;        /* insert successful */
+        {
+            inserted = &avlt->root;
+        }
+
+        bf = _avlTreeGetBalanceFactor(parent);
+
+        if (bf < -1) /* left tree too higher */
+        {
+            avltn = parent->left;
+            if (_avlTreeGetBalanceFactor(avltn) == 1) /* right tree higher */
+            {
+                binTreeLeftRotate(&parent->left, avltn);
+                _avlTreeUpdateHeight(avltn);
+                avltn = parent->left;
+                _avlTreeUpdateHeight(avltn);
+            }
+
+            binTreeRightRotate(inserted, parent);
+        }
+        else if (bf > 1) /* right tree too higher */
+        {
+            avltn = parent->right;
+            if (_avlTreeGetBalanceFactor(avltn) == -1) /* left tree higher */
+            {
+                binTreeRightRotate(&parent->right, avltn);
+                _avlTreeUpdateHeight(avltn);
+                avltn = parent->right;
+                _avlTreeUpdateHeight(avltn);
+            }
+
+            binTreeLeftRotate(inserted, parent);
+        }
+        _avlTreeUpdateHeight(parent);
+        parent = *inserted;
+        _avlTreeUpdateHeight(parent);
+        parent = parent->parent;
+    }
+}
+
+int avlTreeInsert(AVLTree *avlt, AVLTreeNode *avltn)
+{
+    int ret = bstInsert(avlt, avltn);
+
+    if (ret != 0)
+    {
+        goto _done;
+    }
+
+    _avlTreeRebalance(avlt, avltn);
+
+_done:
+    return ret;
+}
+
+static AVLTreeNode *_getDeleteNode(AVLTreeNode *avltn)
+{
+    AVLTreeNode *ret;
+
+    if (avltn->left == NULL || avltn->right == NULL)
+    {
+        ret = avltn;
     }
     else
     {
-
-        cmpresult = avltree->cmp(proot->key, avlNode->key);
-        if (cmpresult == 0)
+        ret = avltn->right;
+        while (ret->left)
         {
-            /* key already exists */
-            if (avltree->allowSameKey)
-            { /* not allowed duplicated key */
-                /* allowed duplicated key */
-                dln = avlNode->dlist.header.next;
-                if (!isDoubleListSentinel(dln))
-                {
-                    removeDoubleListNode(dln);
-                    addNodeAtDoubleListTail(&proot->dlist, dln);
-                }
-            }
-            return 1;
-        }
-        /* insert to left tree */
-        else if (cmpresult == 1)
-        {
-            if (_doAvlTreeInsert(*root, &proot->left, avlNode, taller, avltree) == 0)
-            {
-                if (*taller)
-                {
-                    switch (proot->property)
-                    {
-                    case leftHeight:
-                        _leftBalance(avltree, proot);
-                        *taller = 0;
-                        break;
-                    case sameHeight:
-                        proot->property = leftHeight;
-                        *taller = 1;
-                        break;
-                    case rightHeight:
-                        proot->property = sameHeight;
-                        *taller = 0;
-                        break;
-                    }
-                }
-            }
-            return 0;
-        }
-        else
-        {
-            if (_doAvlTreeInsert(*root, &proot->right, avlNode, taller, avltree) == 0)
-            {
-                if (*taller)
-                {
-                    switch (proot->property)
-                    {
-                    case rightHeight:
-                        _rightBalance(avltree, proot);
-                        *taller = 0;
-                        break;
-                    case sameHeight:
-                        proot->property = rightHeight;
-                        *taller = 1;
-                        break;
-                    case leftHeight:
-                        proot->property = sameHeight;
-                        *taller = 0;
-                        break;
-                    }
-                }
-            }
-            return 0;
+            ret = ret->left;
         }
     }
-    return 1;
+
+    return avltn->right == ret ? ret : ret->parent;
+}
+
+AVLTreeNode *avlTreeDelete(AVLTree *avlt, void *key)
+{
+    AVLTreeNode *avltn = bstSearch(avlt, key), *deleted;
+    ckpvThenReturn(avltn, NULL, NULL);
+
+    deleted = _getDeleteNode(avltn);
+    avltn = bstDelete(avlt, key);
+
+    _avlTreeRebalance(avlt, deleted);
+
+    return avltn;
 }

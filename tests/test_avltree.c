@@ -1,6 +1,6 @@
 #include <string.h>
 #include "test.h"
-#include "bst.h"
+#include "avlTree.h"
 #include "tools.h"
 
 static int bstKeyCmp(const void *a, const void *b)
@@ -115,11 +115,42 @@ static void __postorder(BinTreeNode *btn, binTreeNodeVisit visit)
     visit(btn);
 }
 
+static inline intptr_t _avlTreeGetBalanceFactor(AVLTreeNode *avltn)
+{
+    AVLTreeNode *left, *right;
+    intptr_t hl, hr;
+
+    left = avltn->left;
+    right = avltn->right;
+
+    hl = left ? left->property : 0;
+    hr = right ? right->property : 0;
+
+    return hr - hl;
+}
+
+bool avlTreeIsBalanced(AVLTreeNode *root)
+{
+    if (!root)
+        return 1;
+
+    intptr_t bf = _avlTreeGetBalanceFactor(root);
+
+    // 如果当前节点不平衡
+    if (bf < -1 || bf > 1)
+    {
+        return 0;
+    }
+
+    // 递归检查左右子树
+    return avlTreeIsBalanced(root->left) && avlTreeIsBalanced(root->right);
+}
+
 #define __ARR_MAX_SIZE 1024
 #define __MAX_INT_KEY __INT_MAX__
 #define __ARR_MAX_SIZE_PVP 65535
 
-static inline void test_bstInsert()
+static inline void test_avlTreeInsert()
 {
     _TEST_BEGIN();
 
@@ -129,30 +160,25 @@ static inline void test_bstInsert()
     char *key, *data, *key1;
     int arrSize, intK;
 
-    bt = binTreeCreate(bstKeyCmp, 1);
-    assert(bt);
-    assert(bt->cmp == bstKeyCmp);
-    assert(bt->root == NULL);
-    assert(bt->allowSameKey == 1);
-    assert(bt->size == 0);
+    bt = avlTreeCreate(bstKeyCmp, 1);
 
     key = genRandomAsciiStr(16);
     assert(key);
-    btn = binTreeNodeCreate(0, sizeof(char *), &key, __deNode, __freeKey);
+    btn = avlTreeNodeCreate(sizeof(char *), &key, __deNode, __freeKey);
     data = genRandomAsciiStr(32);
     assert(data);
-    assert(binTreeNodeAddData(btn, sizeof(char *), &data));
-    assert(bstInsert(bt, btn) == 0);
+    assert(avlTreeNodeAddData(btn, sizeof(char *), &data));
+    assert(avlTreeInsert(bt, btn) == 0);
 
     key1 = MALLOC(17);
     assert(key1);
     memcpy(key1, key, 17);
-    btn = binTreeNodeCreate(0, sizeof(char *), &key1, __deNode, __freeKey);
+    btn = avlTreeNodeCreate(sizeof(char *), &key1, __deNode, __freeKey);
     data = genRandomAsciiStr(32);
     assert(data);
-    assert(binTreeNodeAddData(btn, sizeof(char *), &data));
+    assert(avlTreeNodeAddData(btn, sizeof(char *), &data));
 
-    assert(bstInsert(bt, btn) == 1);
+    assert(avlTreeInsert(bt, btn) == 1);
     FREE(btn);
 
     binTreeTravalPreorder(bt, __visitBstNodeStrKey);
@@ -160,65 +186,65 @@ static inline void test_bstInsert()
 
     key = genRandomAsciiStr(16);
     assert(key);
-    btn = binTreeNodeCreate(0, sizeof(char *), &key, __deNode, __freeKey);
+    btn = avlTreeNodeCreate(sizeof(char *), &key, __deNode, __freeKey);
     data = genRandomAsciiStr(32);
     assert(data);
-    assert(binTreeNodeAddData(btn, sizeof(char *), &data));
-    assert(bstInsert(bt, btn) == 0);
+    assert(avlTreeNodeAddData(btn, sizeof(char *), &data));
+    assert(avlTreeInsert(bt, btn) == 0);
 
     binTreeTravalPreorder(bt, __visitBstNodeStrKey);
 
     binTreeDestory(bt, 1);
 
-    bt = binTreeCreate(bstIntKeyCmp, 0);
-    assert(bt);
-    assert(bt->cmp == bstIntKeyCmp);
-    assert(bt->root == NULL);
-    assert(bt->allowSameKey == 0);
-    assert(bt->size == 0);
-    arrSize = rand() % __ARR_MAX_SIZE_PVP;
-    int btSize = 0;
-    printf("arrSize: %d\n", arrSize);
-    for (int i = 1; i < arrSize; i++)
+    for (int i = 0; i < 200; i++)
     {
-        intK = rand() % __MAX_INT_KEY;
-        btn = binTreeNodeCreate(0, sizeof(char *), &intK, __deNode, NULL);
-        data = genRandomAsciiStr(32);
-        assert(data);
-        assert(binTreeNodeAddData(btn, sizeof(char *), &data));
-        int res = bstInsert(bt, btn);
-        assert(res >= 0);
-        if (res == 0)
+
+        bt = avlTreeCreate(bstIntKeyCmp, 0);
+        arrSize = rand() % __ARR_MAX_SIZE_PVP;
+        int btSize = 0;
+        printf("arrSize: %d\n", arrSize);
+        for (int i = 1; i < arrSize; i++)
         {
-            btSize++;
+            intK = rand() % __MAX_INT_KEY;
+            btn = avlTreeNodeCreate(sizeof(char *), &intK, __deNode, NULL);
+            data = genRandomAsciiStr(32);
+            assert(data);
+            assert(avlTreeNodeAddData(btn, sizeof(char *), &data));
+            int res = avlTreeInsert(bt, btn);
+            assert(res >= 0);
+            if (res == 0)
+            {
+                btSize++;
+            }
         }
+        assert(btSize == bt->size);
+
+        __orp = __outR;
+        __onrp = __outNR;
+        binTreeTravalPreorder(bt, __visitBstNodeIntKeyNR);
+        __preorder(bt->root, __visitBstNodeIntKeyR);
+        assert(strcmp(__outR, __outNR) == 0);
+
+        __orp = __outR;
+        __onrp = __outNR;
+        binTreeTravalInorder(bt, __visitBstNodeIntKeyNR);
+        __inorder(bt->root, __visitBstNodeIntKeyR);
+        assert(strcmp(__outR, __outNR) == 0);
+
+        __orp = __outR;
+        __onrp = __outNR;
+        binTreeTravalPostorder(bt, __visitBstNodeIntKeyNR);
+        __postorder(bt->root, __visitBstNodeIntKeyR);
+        assert(strcmp(__outR, __outNR) == 0);
+
+        assert(avlTreeIsBalanced(bt->root));
+
+        binTreeDestory(bt, 1);
     }
-    assert(btSize == bt->size);
-
-    __orp = __outR;
-    __onrp = __outNR;
-    binTreeTravalPreorder(bt, __visitBstNodeIntKeyNR);
-    __preorder(bt->root, __visitBstNodeIntKeyR);
-    assert(strcmp(__outR, __outNR) == 0);
-
-    __orp = __outR;
-    __onrp = __outNR;
-    binTreeTravalInorder(bt, __visitBstNodeIntKeyNR);
-    __inorder(bt->root, __visitBstNodeIntKeyR);
-    assert(strcmp(__outR, __outNR) == 0);
-
-    __orp = __outR;
-    __onrp = __outNR;
-    binTreeTravalPostorder(bt, __visitBstNodeIntKeyNR);
-    __postorder(bt->root, __visitBstNodeIntKeyR);
-    assert(strcmp(__outR, __outNR) == 0);
-
-    binTreeDestory(bt, 1);
-
     _TEST_END();
 }
 
-static inline void test_bstSearch()
+static inline void test_avlTreeSearch()
 {
     _TEST_BEGIN();
     srand(time(NULL));
@@ -227,7 +253,7 @@ static inline void test_bstSearch()
     BinTreeNode *btn;
     int arrSize, keyArr[__ARR_MAX_SIZE * 2];
 
-    bt = binTreeCreate(bstIntKeyCmp, 0);
+    bt = avlTreeCreate(bstIntKeyCmp, 0);
     assert(bt);
     assert(bt->cmp == bstIntKeyCmp);
     assert(bt->root == NULL);
@@ -240,8 +266,8 @@ static inline void test_bstSearch()
     for (int i = 0; i < arrSize; i++)
     {
         keyArr[i] = rand() % __MAX_INT_KEY;
-        btn = binTreeNodeCreate(0, sizeof(char *), keyArr + i, FREE, NULL);
-        int res = bstInsert(bt, btn);
+        btn = avlTreeNodeCreate(sizeof(char *), keyArr + i, FREE, NULL);
+        int res = avlTreeInsert(bt, btn);
         assert(res >= 0);
         if (res == 0)
         {
@@ -258,7 +284,7 @@ static inline void test_bstSearch()
     {
         printf("%d(%d), ", keyArr[i], i);
 
-        btn = bstSearch(bt, keyArr + i);
+        btn = avlTreeSearch(bt, keyArr + i);
         if (i < arrSize)
         {
             assert(*((int *)(btn->key)) == keyArr[i]);
@@ -275,7 +301,7 @@ static inline void test_bstSearch()
     _TEST_END();
 }
 
-static inline void test_bstDelete()
+static inline void test_avlTreeDelete()
 {
     _TEST_BEGIN();
     srand(time(NULL));
@@ -284,7 +310,7 @@ static inline void test_bstDelete()
     BinTreeNode *btn;
     int arrSize, keyArr[__ARR_MAX_SIZE * 2];
 
-    bt = binTreeCreate(bstIntKeyCmp, 0);
+    bt = avlTreeCreate(bstIntKeyCmp, 0);
 
     arrSize = rand() % __ARR_MAX_SIZE;
     printf("arrSize: %d\n", arrSize);
@@ -292,13 +318,14 @@ static inline void test_bstDelete()
     for (int i = 0; i < arrSize; i++)
     {
         keyArr[i] = rand() % __MAX_INT_KEY;
-        btn = binTreeNodeCreate(0, sizeof(char *), keyArr + i, FREE, NULL);
-        int res = bstInsert(bt, btn);
+        btn = avlTreeNodeCreate(sizeof(char *), keyArr + i, FREE, NULL);
+        int res = avlTreeInsert(bt, btn);
         assert(res >= 0);
         if (res == 0)
         {
             btSize++;
         }
+        assert(avlTreeIsBalanced(bt->root));
     }
 
     assert(bt->size == btSize);
@@ -311,15 +338,14 @@ static inline void test_bstDelete()
     printf("keyArr: ");
     for (int i = 0; i < arrSize * 2 - 1; i++)
     {
-        int j = rand() % (arrSize * 2);
-        printf("%d(%d), ", keyArr[j], j);
-        btn = bstDelete(bt, keyArr + j);
-        if (j < arrSize && btn)
+        printf("%d(%d), ", keyArr[i], i);
+
+        btn = avlTreeDelete(bt, keyArr + i);
+        assert(avlTreeIsBalanced(bt->root));
+        if (i < arrSize)
         {
             assert(btn);
-            assert(*((int *)(btn->key)) == keyArr[j]);
-            printf("bt->size: %d, btSize: %d\n", bt->size, btSize);
-            fflush(stdout);
+            assert(*((int *)(btn->key)) == keyArr[i]);
             assert(bt->size == --btSize);
             FREE(btn);
             // binTreeTravalInorder(bt, __visitBstNodeIntKey);
@@ -334,43 +360,45 @@ static inline void test_bstDelete()
 
     arrSize = rand() % __ARR_MAX_SIZE;
     printf("arrSize: %d\n", arrSize);
-    btSize = bt->size;
+    btSize = 0;
     for (int i = 0; i < arrSize; i++)
     {
         keyArr[i] = rand() % __MAX_INT_KEY;
-        btn = binTreeNodeCreate(0, sizeof(char *), keyArr + i, FREE, NULL);
-        int res = bstInsert(bt, btn);
+        btn = avlTreeNodeCreate(sizeof(char *), keyArr + i, FREE, NULL);
+        int res = avlTreeInsert(bt, btn);
+        assert(avlTreeIsBalanced(bt->root));
         assert(res >= 0);
         if (res == 0)
         {
             btSize++;
         }
     }
-    printf("############# btSize: %d ###################\n", btSize);
-    for (int i = 0; i < 100; i++)
+
+    for (int i = 0; i < 10000 && btSize > 0; i++)
     {
         int idx = rand() % arrSize;
-        btn = bstDelete(bt, keyArr + idx);
+        btn = avlTreeDelete(bt, keyArr + idx);
+        assert(avlTreeIsBalanced(bt->root));
         binTreeTravalInorder(bt, __visitBstNodeIntKey);
         printf("---------------------\n");
         binTreeTravalInorder(bt, __visitBstNodeIntKey);
         printf("---------------------\n");
         binTreeTravalInorder(bt, __visitBstNodeIntKey);
         printf("---------------------\n");
-
         if (btn)
         {
-            printf("bt->size: %d, btSize: %d\n", bt->size, btSize);
-            fflush(stdout);
+
             assert(bt->size == --btSize);
             FREE(btn);
         }
     }
+    printf("############# btSize: %d arrSize: %d  ###################\n", btSize, arrSize);
 
     binTreeDestory(bt, 1);
     _TEST_END();
 }
 
+#if 0
 static inline void test_bstRotate()
 {
     _TEST_BEGIN();
@@ -418,14 +446,12 @@ static inline void test_bstRotate()
 
     _TEST_END();
 }
-
+#endif
 int main(void)
 {
 
-    test_bstInsert();
-    test_bstSearch();
-    test_bstDelete();
-    test_bstRotate();
-
+    test_avlTreeInsert();
+    test_avlTreeSearch();
+    test_avlTreeDelete();
     return 0;
 }
