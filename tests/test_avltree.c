@@ -387,7 +387,6 @@ static inline void test_avlTreeDelete()
         printf("---------------------\n");
         if (btn)
         {
-
             assert(bt->size == --btSize);
             FREE(btn);
         }

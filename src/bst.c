@@ -155,6 +155,7 @@ BinTreeNode *bstDelete(BinTree *bt, void *key)
         {
             successor->left->parent = successor;
         }
+        /* avoid cycle */
         successor->right = btn->right == successor ? NULL : btn->right;
         if (successor->right)
         {
