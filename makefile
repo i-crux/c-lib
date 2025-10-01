@@ -18,7 +18,7 @@ TEST_DEP		:= $(TEST_OBJ:.o=.d)
 
 AR      := ar
 CC      ?= gcc
-CFLAGS  ?= -Wall -Wextra -fPIC -MMD -MP -I$(SRC_DIR)/include
+CFLAGS  ?= -Wall -Wextra -fPIC -MMD -MP -I$(SRC_DIR)/include -I$(TEST_SRC_DIR)/include
 LDFLAGS := -shared
 
 
@@ -70,5 +70,5 @@ all: $(STATIC_LIB) $(SHARED_LIB)
 clean:
 	rm -rf $(BUILD) $(LIBDIR) $(TEST_BUILD) $(TEST_BIN_DIR)
 
-test: CFLAGS += -g -I$(TEST_SRC_DIR)/include -DENABLE_DEBUG
+test: CFLAGS += -g -DENABLE_DEBUG
 test: $(TEST_BIN)

@@ -4,8 +4,9 @@
 #include <assert.h>
 
 #include "test.h"
-#include "bst.h"     // 你的 BST 接口
-#include "avlTree.h" // 你的 AVL 接口
+#include "bst.h"
+#include "avlTree.h"
+#include "rbTree.h"
 
 #define N 100000
 #define M 50000
@@ -16,7 +17,7 @@ static int bstIntKeyCmp(const void *a, const void *b)
     return ia - ib;
 }
 
-static inline void test_compareBstAVLTree()
+static inline void test_compareBstAVLRBTree()
 {
     _TEST_BEGIN();
     int *arr = MALLOC(sizeof(int) * N);
@@ -78,6 +79,32 @@ static inline void test_compareBstAVLTree()
     printf("AVL Delete %d elements: %f sec\n", M, (double)(t2 - t1) / CLOCKS_PER_SEC);
     binTreeDestory(avlt, 1);
 
+    // ----------------- test RB -----------------
+    RBTree *rbt = rbTreeCreate(bstIntKeyCmp, 0);
+    RBTreeNode *rbtn;
+
+    t1 = clock();
+    for (i = 0; i < N; i++)
+    {
+        rbtn = rbTreeNodeCreate(sizeof(int), &i, FREE, NULL);
+        assert(rbTreeInsert(rbt, rbtn) == 0);
+    }
+    t2 = clock();
+    printf("RB tree Insert %d elements: %f sec\n", N, (double)(t2 - t1) / CLOCKS_PER_SEC);
+
+    t1 = clock();
+    for (i = 0; i < M; i++)
+        rbTreeSearch(rbt, &arr[rand() % N]);
+    t2 = clock();
+    printf("RB tree Search %d elements: %f sec\n", M, (double)(t2 - t1) / CLOCKS_PER_SEC);
+
+    t1 = clock();
+    for (i = 0; i < M; i++)
+        rbTreeDelete(rbt, &arr[rand() % N]);
+    t2 = clock();
+    printf("RB tree Delete %d elements: %f sec\n", M, (double)(t2 - t1) / CLOCKS_PER_SEC);
+    binTreeDestory(rbt, 1);
+
     FREE(arr);
 
     _TEST_END();
@@ -85,6 +112,6 @@ static inline void test_compareBstAVLTree()
 
 int main(void)
 {
-    test_compareBstAVLTree();
+    test_compareBstAVLRBTree();
     return 0;
 }

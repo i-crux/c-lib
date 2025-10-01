@@ -6,6 +6,7 @@
         "tools.h": "c",
         "random": "c",
         "bst.h": "c",
-        "bintree.h": "c"
+        "bintree.h": "c",
+        "rbtree.h": "c"
     }
 }
