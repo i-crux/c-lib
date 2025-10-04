@@ -7,6 +7,7 @@
 #include "bst.h"
 #include "avlTree.h"
 #include "rbTree.h"
+#include "hash.h"
 
 #define N 100000
 #define M 50000
@@ -17,7 +18,20 @@ static int bstIntKeyCmp(const void *a, const void *b)
     return ia - ib;
 }
 
-static inline void test_compareBstAVLRBTree()
+static int __intKeyCmp(uintptr_t a, uintptr_t b)
+{
+    int aInt = (int)a, bInt = (int)b;
+
+    return aInt - bInt;
+}
+static void _dlnFreeIntKeyStrData(void *n)
+{
+    DoubleListNode *dln = n;
+    HashNode *hn = containerOf(dln, HashNode, dln);
+    FREE(hn);
+}
+
+static inline void test_compareBstAVLRBTreeHash()
 {
     _TEST_BEGIN();
     int *arr = MALLOC(sizeof(int) * N);
@@ -105,6 +119,30 @@ static inline void test_compareBstAVLRBTree()
     printf("RB tree Delete %d elements: %f sec\n", M, (double)(t2 - t1) / CLOCKS_PER_SEC);
     binTreeDestory(rbt, 1);
 
+    // ----------------- test hash -----------------
+    Hash *h;
+    h = hashCreate(defaultHashNum, __intKeyCmp, 49157, _dlnFreeIntKeyStrData);
+    t1 = clock();
+    for (i = 0; i < N; i++)
+    {
+        assert(hashAdd(h, (uintptr_t)i, 0, NULL) == 0);
+    }
+    t2 = clock();
+    printf("hash Insert %d elements: %f sec\n", N, (double)(t2 - t1) / CLOCKS_PER_SEC);
+
+    t1 = clock();
+    for (i = 0; i < M; i++)
+        hashSearch(h, (uintptr_t)(((uintptr_t)rand()) % N));
+    t2 = clock();
+    printf("hash Search %d elements: %f sec\n", M, (double)(t2 - t1) / CLOCKS_PER_SEC);
+
+    t1 = clock();
+    for (i = 0; i < M; i++)
+        hashSearch(h, (uintptr_t)(((uintptr_t)rand()) % N));
+    t2 = clock();
+    printf("hash Delete %d elements: %f sec\n", M, (double)(t2 - t1) / CLOCKS_PER_SEC);
+    hashDestory(h);
+
     FREE(arr);
 
     _TEST_END();
@@ -112,6 +150,6 @@ static inline void test_compareBstAVLRBTree()
 
 int main(void)
 {
-    test_compareBstAVLRBTree();
+    test_compareBstAVLRBTreeHash();
     return 0;
 }

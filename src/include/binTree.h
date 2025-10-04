@@ -76,6 +76,8 @@ BinTreeNodeData *binTreeNodeDataCreate(size_t dataSize, void *data);
  * @param property: property of the binary tree node
  * @param keySize: size of key;
  * @param key: pointor to key
+ * @param deNode: destructure data node
+ * @param freeKey: free key's memory if needed
  *
  * @return pointor to [BinTreeNode] on successful, [NULL] on failure
  */
